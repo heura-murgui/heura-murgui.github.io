@@ -15,15 +15,17 @@ body, html {
 }
 
 /*
-  ESTILOS DE CENTRADO (Flexbox)
-  ==============================
-  Usa Flexbox para centrar el contenido vertical y horizontalmente en la página.
+  ESTILOS DE CENTRADO Y ALINEACIÓN SUPERIOR
+  ==========================================
+  Usamos Flexbox. El 'align-items: flex-start;' alinea el contenido arriba.
 */
 body {
     display: flex;
     justify-content: center; /* Centrado horizontal */
-    align-items: center; /* Centrado vertical */
-    text-align: center; /* Asegura que el texto dentro del contenedor también se centre */
+    align-items: flex-start; /* ✨ MODIFICADO: Alineado verticalmente arriba */
+    text-align: center; 
+    /* Agregamos un padding superior para que no toque el borde del navegador */
+    padding-top: 10vh; 
 }
 
 /*
@@ -31,7 +33,7 @@ body {
   ====================
 */
 .content-wrapper {
-    /* Puedes ajustar el ancho máximo para evitar que el texto se extienda demasiado en pantallas grandes */
+    /* Quitamos el height: 100% que ya no es necesario con el padding-top */
     max-width: 600px; 
     padding: 20px;
 }
@@ -41,7 +43,7 @@ body {
   =====================
 */
 h1 {
-    font-size: 3em; /* Tamaño grande para el nombre */
+    font-size: 3em; 
     margin-bottom: 0.2em;
     color: #333;
 }
@@ -60,39 +62,37 @@ h1 {
 */
 .links {
     margin-top: 20px;
-    display: flex; /* Alinea los enlaces y separadores en una fila */
-    justify-content: center; /* Centra los enlaces dentro del contenedor 'links' */
-    gap: 8px; /* Espacio entre el enlace y el separador */
+    display: flex; 
+    justify-content: center; 
+    gap: 8px; 
 }
 
 .nav-link {
-    color: #c2c2c2; /* Color de enlace por defecto (gris) */
+    color: #c2c2c2; 
     text-decoration: none;
-    padding: 0 5px; /* Espacio alrededor de cada enlace */
-    transition: color 0.3s; /* Transición suave para el efecto hover */
+    padding: 0 5px; 
+    /* ✨ ELIMINADO: La línea 'transition: color 0.3s;' para quitar el easy ease */
 }
 
 .nav-link:hover {
-    color: #fe0000; /* Color rojo al pasar el ratón */
+    color: #fe0000; 
     text-decoration: underline;
 }
 
 .separator {
     color: #c2c2c2;
-    user-select: none; /* Evita que el separador sea seleccionable */
+    user-select: none; 
 }
 
 /*
-  ESTILOS RESPONSIVOS (Opcional)
+  ESTILOS RESPONSIVOS
   ==============================
-  Ajusta el tamaño del título para móviles.
 */
 @media (max-width: 600px) {
     h1 {
         font-size: 2em;
     }
     .links {
-        /* Permite que los enlaces se apilen en pantallas muy pequeñas */
         flex-wrap: wrap; 
     }
 }
