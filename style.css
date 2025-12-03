@@ -1,98 +1,43 @@
 /*
-  ESTILOS GLOBALES Y RESET
-  ========================
+  ESTILOS GLOBALES Y RESET
+  ========================
 */
 body, html {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    /* Fuente y espaciado definidos por el usuario */
-    font-size: 11pt;
-    font-family: "Times New Roman", Times, serif;
-    letter-spacing: -0.3px;
-    background-color: #f7f7f7; /* Fondo claro por defecto */
-    color: #333; /* Color de texto oscuro por defecto */
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* ... (otras propiedades de fuente y color) ... */
+    font-size: 11pt;
+    font-family: "Times New Roman", Times, serif;
+    letter-spacing: -0.3px;
+    background-color: #f7f7f7; /* Fondo claro por defecto */
+    color: #333; /* Color de texto oscuro por defecto */
 }
 
 /*
-  ESTILOS DE CENTRADO Y ALINEACIÓN SUPERIOR
-  ==========================================
-  Usamos Flexbox. El 'align-items: flex-start;' alinea el contenido arriba.
+  ESTILOS DE CENTRADO Y ALINEACIÓN SUPERIOR
+  ==========================================
 */
 body {
-    display: flex;
-    justify-content: center; /* Centrado horizontal */
-    align-items: flex-start; /* ✨ MODIFICADO: Alineado verticalmente arriba */
-    text-align: center; 
-    /* Agregamos un padding superior para que no toque el borde del navegador */
-    padding-top: 10vh; 
+    /* IMPORTANTE: Para que Flexbox funcione verticalmente, el body debe tener altura (height: 100%) */
+    display: flex;
+    justify-content: center; /* ✅ Centrado horizontal (eje principal) */
+    align-items: flex-start; /* ✅ Alineado verticalmente arriba (eje transversal) */
+
+    /* ⚠️ Sugerencia: Quitamos el 'text-align: center;' de aquí. Es mejor centrar el texto en el contenedor. */
+    /* Agregamos un padding superior para separar el contenido del borde del navegador */
+    padding-top: 10vh; 
 }
 
 /*
-  CONTENEDOR PRINCIPAL
-  ====================
+  CONTENEDOR PRINCIPAL
+  ====================
 */
 .content-wrapper {
-    /* Quitamos el height: 100% que ya no es necesario con el padding-top */
-    max-width: 600px; 
-    padding: 20px;
+    max-width: 600px; 
+    padding: 20px;
+    /* 💡 Centramos el texto DENTRO de este contenedor para que afecte solo al contenido */
+    text-align: center;
 }
 
-/*
-  ESTILOS DE TIPOGRAFÍA
-  =====================
-*/
-h1 {
-    font-size: 3em; 
-    margin-bottom: 0.2em;
-    color: #333;
-}
-
-.subtitle {
-    font-size: 1.1em;
-    margin-top: 0;
-    margin-bottom: 30px;
-    font-style: italic;
-    color: #666;
-}
-
-/*
-  ESTILOS DE ENLACES DE NAVEGACIÓN
-  ================================
-*/
-.links {
-    margin-top: 20px;
-    display: flex; 
-    justify-content: center; 
-    gap: 8px; 
-}
-
-.nav-link {
-    color: #c2c2c2; 
-    text-decoration: none;
-    padding: 0 5px; 
-    /* ✨ ELIMINADO: La línea 'transition: color 0.3s;' para quitar el easy ease */
-}
-
-.nav-link:hover {
-    color: #fe0000; 
-    text-decoration: underline;
-}
-
-.separator {
-    color: #c2c2c2;
-    user-select: none; 
-}
-
-/*
-  ESTILOS RESPONSIVOS
-  ==============================
-*/
-@media (max-width: 600px) {
-    h1 {
-        font-size: 2em;
-    }
-    .links {
-        flex-wrap: wrap; 
-    }
-}
+/* ... (el resto de tus estilos) ... */
