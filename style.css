@@ -1,7 +1,4 @@
-/*
-  ESTILOS GLOBALES Y RESET
-  ========================
-*/
+
 body, html {
     height: 100%;
     margin: 0;
@@ -16,22 +13,17 @@ body, html {
 
 /*
   ESTILOS DE CENTRADO Y ALINEACIÓN SUPERIOR
-  ==========================================
 */
 body {
     /* IMPORTANTE: Para que Flexbox funcione verticalmente, el body debe tener altura (height: 100%) */
     display: flex;
-    justify-content: center; /* ✅ Centrado horizontal (eje principal) */
-    align-items: flex-start; /* ✅ Alineado verticalmente arriba (eje transversal) */
-
-    /* ⚠️ Sugerencia: Quitamos el 'text-align: center;' de aquí. Es mejor centrar el texto en el contenedor. */
-    /* Agregamos un padding superior para separar el contenido del borde del navegador */
-    padding-top: 10vh; 
+    justify-content: center; /* Centrado horizontal (eje principal) */
+    align-items: flex-start; /* Alineado verticalmente arriba (eje transversal) */
+    padding-top: 0.2vh; 
 }
 
 /*
   CONTENEDOR PRINCIPAL
-  ====================
 */
 .content-wrapper {
     max-width: 600px; 
@@ -40,4 +32,3 @@ body {
     text-align: center;
 }
 
-/* ... (el resto de tus estilos) ... */
