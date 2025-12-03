@@ -1,0 +1,98 @@
+/*
+  ESTILOS GLOBALES Y RESET
+  ========================
+*/
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* Fuente y espaciado definidos por el usuario */
+    font-size: 11pt;
+    font-family: "Times New Roman", Times, serif;
+    letter-spacing: -0.3px;
+    background-color: #f7f7f7; /* Fondo claro por defecto */
+    color: #333; /* Color de texto oscuro por defecto */
+}
+
+/*
+  ESTILOS DE CENTRADO (Flexbox)
+  ==============================
+  Usa Flexbox para centrar el contenido vertical y horizontalmente en la página.
+*/
+body {
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical */
+    text-align: center; /* Asegura que el texto dentro del contenedor también se centre */
+}
+
+/*
+  CONTENEDOR PRINCIPAL
+  ====================
+*/
+.content-wrapper {
+    /* Puedes ajustar el ancho máximo para evitar que el texto se extienda demasiado en pantallas grandes */
+    max-width: 600px; 
+    padding: 20px;
+}
+
+/*
+  ESTILOS DE TIPOGRAFÍA
+  =====================
+*/
+h1 {
+    font-size: 3em; /* Tamaño grande para el nombre */
+    margin-bottom: 0.2em;
+    color: #333;
+}
+
+.subtitle {
+    font-size: 1.1em;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-style: italic;
+    color: #666;
+}
+
+/*
+  ESTILOS DE ENLACES DE NAVEGACIÓN
+  ================================
+*/
+.links {
+    margin-top: 20px;
+    display: flex; /* Alinea los enlaces y separadores en una fila */
+    justify-content: center; /* Centra los enlaces dentro del contenedor 'links' */
+    gap: 8px; /* Espacio entre el enlace y el separador */
+}
+
+.nav-link {
+    color: #c2c2c2; /* Color de enlace por defecto (gris) */
+    text-decoration: none;
+    padding: 0 5px; /* Espacio alrededor de cada enlace */
+    transition: color 0.3s; /* Transición suave para el efecto hover */
+}
+
+.nav-link:hover {
+    color: #fe0000; /* Color rojo al pasar el ratón */
+    text-decoration: underline;
+}
+
+.separator {
+    color: #c2c2c2;
+    user-select: none; /* Evita que el separador sea seleccionable */
+}
+
+/*
+  ESTILOS RESPONSIVOS (Opcional)
+  ==============================
+  Ajusta el tamaño del título para móviles.
+*/
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2em;
+    }
+    .links {
+        /* Permite que los enlaces se apilen en pantallas muy pequeñas */
+        flex-wrap: wrap; 
+    }
+}
