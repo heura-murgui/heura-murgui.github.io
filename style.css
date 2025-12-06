@@ -145,10 +145,13 @@ body {
     .header-wrapper {
         margin-bottom: 20px;
     }
-    /* --- ESTILOS DE LA BARRA DE BÚSQUEDA --- */
+    
+/* --- ESTILOS DE LA BARRA DE BÚSQUEDA --- */
+
+/* --- ESTILOS DE LA BARRA DE BÚSQUEDA (Ajustados al Look Minimalista) --- */
 
 .header__search {
-    margin-top: 25px; /* Separación de los enlaces de navegación */
+    margin-top: 25px; 
     display: flex;
     justify-content: center;
     width: 100%;
@@ -157,11 +160,16 @@ body {
 .search-bar__form {
     display: flex;
     align-items: center;
-    max-width: 400px; /* Limitar el ancho de la barra */
+    max-width: 450px; /* Aumentar ligeramente el ancho para que quepa el placeholder */
     width: 100%;
-    border: 1px solid #ccc; /* Borde simple */
-    border-radius: 5px;
-    padding: 5px 10px;
+    
+    /* AJUSTE: Borde simple y delgado (como en la imagen) */
+    border: 1px solid #ccc; 
+    
+    /* AJUSTE: Eliminar el padding extra en el formulario para que el borde rodee solo el input */
+    padding: 0; 
+    
+    border-radius: 0; /* Eliminar esquinas redondeadas si las tenías */
     background-color: #fff;
 }
 
@@ -169,18 +177,30 @@ body {
     border: none;
     outline: none;
     flex-grow: 1;
-    padding: 8px 10px;
+    
+    /* AJUSTE: Padding interno para el campo de texto */
+    padding: 10px 15px; 
+    
     font-size: 11pt;
-    /* Usamos la misma tipografía para que se integre */
     font-family: "Times New Roman", Times, serif; 
     letter-spacing: -0.3px;
-    color: #333;
     background: transparent;
+    
+    /* AJUSTE: Color del texto ingresado (oscuro) */
+    color: #333; 
+}
+
+/* AJUSTE: Color del texto "placeholder" (gris claro, como en la imagen) */
+.search-bar__query-input::placeholder {
+    color: #888; /* Gris más claro que el texto normal */
 }
 
 .search-bar__actions {
     display: flex;
     align-items: center;
+    
+    /* AJUSTE: Mover las acciones un poco a la izquierda del borde derecho */
+    padding-right: 15px; 
 }
 
 .icon-wrapper {
@@ -188,16 +208,24 @@ body {
     border: none;
     cursor: pointer;
     padding: 0;
-    margin-left: 10px;
-    color: #333; /* Color de los íconos */
+    margin-left: 8px; /* Espacio más pequeño entre los íconos */
+    
+    /* AJUSTE: Color de los íconos (gris oscuro) */
+    color: #888; 
+    
     display: flex;
     align-items: center;
+    transition: color 0.1s;
+}
+
+.icon-wrapper:hover {
+    color: #333; /* Oscurecer al pasar el ratón */
 }
 
 .icon-wrapper svg {
     display: block;
-    width: 18px; 
-    height: 18px;
+    width: 16px; /* Ajuste del tamaño de los íconos */
+    height: 16px;
 }
 
 /* Ocultar el botón de reset por defecto */
@@ -205,7 +233,7 @@ body {
     display: none; 
 }
 
-/* Estilos de enfoque para accesibilidad/visibilidad */
+/* Estilos de enfoque */
 .search-bar__query-input:focus {
     box-shadow: none;
 }
