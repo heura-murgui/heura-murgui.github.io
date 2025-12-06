@@ -1,7 +1,7 @@
 // Fetch blocks from Arena channel and update the shelf
 (function() {
     // Enter the Are.na channel slug here. 
-    const CHANNEL_SLUG = 'marta-mkv'; // <-- ¡MODIFICA ESTA LÍNEA!
+    const CHANNEL_SLUG = 'heura-murgui; // <-- ¡MODIFICA ESTA LÍNEA!
     const API_BASE = 'https://api.are.na/v2';
     
     // Function to fetch a page of contents
