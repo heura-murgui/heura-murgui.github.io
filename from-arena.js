@@ -1,9 +1,7 @@
 // Fetch blocks from Arena channel and update the shelf
 (function() {
-    // Enter the Are.na channel slug here. It has to be an open or closed channel. Private channels are not supported.
-    // To find your channel slug: go to your channel settings and copy the slug from there
-    // Or check the network tab when viewing your channel to see the API calls
-    const CHANNEL_SLUG = 'marta-mkv'; // Update this with the actual channel slug from your Arena channel
+    // Enter the Are.na channel slug here. 
+    const CHANNEL_SLUG = 'marta-mkv'; // <-- ¡MODIFICA ESTA LÍNEA!
     const API_BASE = 'https://api.are.na/v2';
     
     // Function to fetch a page of contents
@@ -116,9 +114,22 @@
         const shelf = document.getElementById('shelf');
         if (!shelf) return;
         shelf.innerHTML = '';
-        for (const item of items) {
+        
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
             const wrapper = document.createElement('div');
             wrapper.className = 'shelf-item';
+            
+            // LÓGICA DE CLASES BENTO PARA CSS GRID
+            if (i === 0) {
+                // El primer elemento (más reciente) es grande (2x2)
+                wrapper.classList.add('bento-large');
+            } else if (item.type === 'image') {
+                // Las imágenes ocupan más espacio horizontal (2x1)
+                wrapper.classList.add('bento-wide');
+            }
+            // Si es texto, enlace o video (no el primero), usa el tamaño estándar (1x1)
+
             if (item.type === 'image') {
                 const img = document.createElement('img');
                 img.src = item.url;
@@ -128,10 +139,12 @@
                 const video = document.createElement('video');
                 video.src = item.url;
                 video.controls = true;
+                video.style.width = '100%';
+                video.style.height = 'auto';
                 wrapper.appendChild(video);
             } else if (item.type === 'text') {
                 const div = document.createElement('div');
-                div.innerHTML = `<p>${item.content}</p>`;
+                div.innerHTML = item.content; // No añadir <p>, ya tiene HTML
                 wrapper.appendChild(div);
             } else if (item.type === 'link') {
                 const a = document.createElement('a');
@@ -148,11 +161,11 @@
         }
     }
     
-    // Main function to run everything
+    // Function to run everything
     async function updateFromArena() {
         console.log('Fetching blocks from Arena channel:', CHANNEL_SLUG);
         
-        // First try to access the channel directly to check if it exists and is accessible
+        // Test channel access
         try {
             const testResponse = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}`, {
                 method: 'GET',
@@ -162,7 +175,7 @@
             if (!testResponse.ok) {
                 console.error(`Channel access failed: ${testResponse.status} ${testResponse.statusText}`);
                 if (testResponse.status === 401) {
-                    console.error('Channel is private. Make sure your channel is set to "open" or "closed" (not private).');
+                    console.error('Channel is private. Make sure your channel is set to "open" or "closed".');
                 } else if (testResponse.status === 404) {
                     console.error('Channel not found. Check the channel slug.');
                 }
