@@ -32,7 +32,7 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr); 
     
-    gap: 15px; /* Espacio entre las cajas */
+    gap: 0px; /* Espacio entre las cajas */
     max-width: 1200px; 
     margin: 0 auto; 
     padding: 0 20px 40px 20px; 
@@ -46,7 +46,7 @@ body {
     border: none; 
     
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 0px;
     min-height: 150px; 
     
     display: flex;
@@ -54,7 +54,7 @@ body {
     justify-content: space-between; /* Para empujar el contenido hacia arriba/abajo */
     overflow: hidden;
     text-align: left; 
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05); /* Sombra sutil para separación */
+    
 }
 
 /* Imágenes y Videos dentro de las cajas */
