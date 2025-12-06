@@ -3,7 +3,7 @@
     // Enter the Are.na channel slug here. It has to be an open or closed channel. Private channels are not supported.
     // To find your channel slug: go to your channel settings and copy the slug from there
     // Or check the network tab when viewing your channel to see the API calls
-    const CHANNEL_SLUG = 'elliott-computer'; // Update this with the actual channel slug from your Arena channel
+    const CHANNEL_SLUG = 'marta-mkv'; // Update this with the actual channel slug from your Arena channel
     const API_BASE = 'https://api.are.na/v2';
     
     // Function to fetch a page of contents
