@@ -23,6 +23,9 @@ body {
     margin: 0 auto 40px auto; /* Centrar y margen inferior */
     padding: 0 20px; 
     text-align: center;
+    font-size: 11pt;
+    font-family: "Times New Roman", Times, serif;
+    letter-spacing: -0.3px;
 }
 
 /* --- ESTILOS BENTO GRID (ESCRITORIO: 4 COLUMNAS) --- */
