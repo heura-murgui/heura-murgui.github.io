@@ -147,8 +147,7 @@ body {
     }
     
 /* --- ESTILOS DE LA BARRA DE BÚSQUEDA --- */
-
-/* --- ESTILOS DE LA BARRA DE BÚSQUEDA (Ajustados al Look Minimalista) --- */
+/* --- ESTILOS DE LA BARRA DE BÚSQUEDA (Ajustados al Look Rectangular) --- */
 
 .header__search {
     margin-top: 25px; 
@@ -160,16 +159,16 @@ body {
 .search-bar__form {
     display: flex;
     align-items: center;
-    max-width: 450px; /* Aumentar ligeramente el ancho para que quepa el placeholder */
+    max-width: 450px; 
     width: 100%;
     
-    /* AJUSTE: Borde simple y delgado (como en la imagen) */
+    /* Borde de 1px sólido (mantener el look rectangular) */
     border: 1px solid #ccc; 
     
-    /* AJUSTE: Eliminar el padding extra en el formulario para que el borde rodee solo el input */
+    /* ELIMINAR BORDES REDONDEADOS */
     padding: 0; 
+    border-radius: 0; /* Asegura esquinas perfectamente rectas */
     
-    border-radius: 0; /* Eliminar esquinas redondeadas si las tenías */
     background-color: #fff;
 }
 
@@ -178,29 +177,28 @@ body {
     outline: none;
     flex-grow: 1;
     
-    /* AJUSTE: Padding interno para el campo de texto */
-    padding: 10px 15px; 
+    /* Ajustamos el padding para que el texto esté alineado con el borde superior/inferior */
+    padding: 10px 0 10px 15px; /* Arriba/Abajo 10px, Izquierda 15px, Derecha 0 */
     
     font-size: 11pt;
     font-family: "Times New Roman", Times, serif; 
     letter-spacing: -0.3px;
     background: transparent;
-    
-    /* AJUSTE: Color del texto ingresado (oscuro) */
     color: #333; 
 }
 
-/* AJUSTE: Color del texto "placeholder" (gris claro, como en la imagen) */
+/* Color del texto "placeholder" */
 .search-bar__query-input::placeholder {
-    color: #888; /* Gris más claro que el texto normal */
+    color: #888;
 }
 
 .search-bar__actions {
     display: flex;
     align-items: center;
     
-    /* AJUSTE: Mover las acciones un poco a la izquierda del borde derecho */
-    padding-right: 15px; 
+    /* NUEVO AJUSTE: Mover los íconos al borde derecho y aplicar padding solo a este contenedor */
+    padding: 0 15px 0 10px; /* Padding derecho para mover los íconos del borde */
+    height: 100%; /* Asegurar que ocupe toda la altura del formulario */
 }
 
 .icon-wrapper {
@@ -208,9 +206,8 @@ body {
     border: none;
     cursor: pointer;
     padding: 0;
-    margin-left: 8px; /* Espacio más pequeño entre los íconos */
+    margin-left: 8px; 
     
-    /* AJUSTE: Color de los íconos (gris oscuro) */
     color: #888; 
     
     display: flex;
@@ -219,12 +216,12 @@ body {
 }
 
 .icon-wrapper:hover {
-    color: #333; /* Oscurecer al pasar el ratón */
+    color: #333; 
 }
 
 .icon-wrapper svg {
     display: block;
-    width: 16px; /* Ajuste del tamaño de los íconos */
+    width: 16px; 
     height: 16px;
 }
 
