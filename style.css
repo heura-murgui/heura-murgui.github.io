@@ -1,4 +1,4 @@
-/* --- ESTILOS DE FUENTE Y COLORES BÁSICOS (Mantenidos) --- */
+/* --- ESTILOS DE FUENTE Y COLORES BÁSICOS --- */
 body, html {
     height: 100%;
     margin: 0;
@@ -6,57 +6,55 @@ body, html {
     font-size: 11pt;
     font-family: "Times New Roman", Times, serif;
     letter-spacing: -0.3px;
-    background-color: #f7f7f7; 
-    color: #333; 
+    background-color: #f7f7f7; /* Fondo claro */
+    color: #333; /* Color de texto oscuro */
 }
 
-/* --- MODIFICACIÓN DE ESTILOS DE BODY Y CABECERA --- */
+/* --- ESTILOS DE CABECERA Y ENLACES --- */
 
 body {
-    /* El body ya no usa flexbox para el centrado total */
     display: block; 
     padding: 0;
-    padding-top: 20px; /* Espacio superior para la cabecera */
+    padding-top: 20px; 
 }
 
-/* Nuevo contenedor para la cabecera (título y enlaces) */
 .header-wrapper {
-    max-width: 1200px; /* Le damos más ancho para una mejor presentación */
-    margin: 0 auto 40px auto; /* Centrar horizontalmente y añadir margen inferior */
-    padding: 0 20px; /* Relleno lateral */
+    max-width: 1200px; 
+    margin: 0 auto 40px auto; /* Centrar y margen inferior */
+    padding: 0 20px; 
     text-align: center;
 }
 
-/* El nav-link y separator mantienen sus estilos existentes */
-
-/* --- ESTILOS BENTO GRID --- */
+/* --- ESTILOS BENTO GRID (ESCRITORIO: 4 COLUMNAS) --- */
 
 .bento-grid-container {
-    /* 1. Definir como cuadrícula (Grid Container) */
+    /* Cuadrícula de 4 columnas por defecto (para pantallas grandes) */
     display: grid;
-    /* 2. Definir 4 columnas de ancho igual (1fr) */
     grid-template-columns: repeat(4, 1fr); 
     
-    gap: 15px; /* Espacio entre los "bento boxes" */
-    max-width: 1200px; /* Limita el ancho de la cuadrícula */
-    margin: 0 auto; /* Centrar la cuadrícula */
-    padding: 0 20px 40px 20px; /* Relleno lateral y en la parte inferior */
+    gap: 15px; /* Espacio entre las cajas */
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 0 20px 40px 20px; 
 }
 
 .shelf-item {
-    /* Estilo base de la caja bento (1x1) */
+    /* Estilo base de la caja bento */
     background-color: #ffffff;
-    border: 1px solid #ccc;
+    
+    /* AJUSTE: Eliminar marco */
+    border: none; 
+    
     padding: 15px;
     border-radius: 5px;
     min-height: 150px; 
     
-    /* Flexbox interno para organizar el contenido y la hora */
     display: flex;
     flex-direction: column;
-    justify-content: space-between; 
+    justify-content: space-between; /* Para empujar el contenido hacia arriba/abajo */
     overflow: hidden;
-    text-align: left; /* Asegura que el texto dentro de la caja no se centre */
+    text-align: left; 
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05); /* Sombra sutil para separación */
 }
 
 /* Imágenes y Videos dentro de las cajas */
@@ -67,17 +65,17 @@ body {
     display: block;
     object-fit: cover;
     margin-bottom: 10px;
-    max-height: 250px; /* Limita la altura de las imágenes en las cajas 1x1 */
+    max-height: 250px; 
 }
 
-/* --- CLASES DE TAMAÑO BENTO (Modifican el espacio en la cuadrícula) --- */
+/* --- CLASES DE TAMAÑO BENTO (Escritorio) --- */
 
-/* Elemento ancho (ej. Imágenes) - Ocupa 2 de 4 columnas */
+/* Elemento ancho (2 columnas) */
 .bento-wide {
     grid-column: span 2; 
 }
 
-/* Elemento grande (ej. Primer bloque) - Ocupa 2 de 4 columnas y 2 filas */
+/* Elemento grande (2 columnas, 2 filas) */
 .bento-large {
     grid-column: span 2;
     grid-row: span 2;
@@ -86,9 +84,62 @@ body {
 
 /* Estilo para la fecha de creación */
 .shelf-item time {
-    display: block;
+    /* AJUSTE: Ocultar fecha */
+    display: none; 
+    
     margin-top: auto; 
     font-size: 0.8em;
     color: #888;
     text-align: right;
+}
+
+/* =================================================== */
+/* --- DISEÑO RESPONSIVE (MÓVILES y TABLETAS) --- */
+/* =================================================== */
+
+@media (max-width: 768px) {
+    
+    /* En pantallas medianas, reducimos a 2 columnas */
+    .bento-grid-container {
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 10px; 
+        padding: 0 10px 20px 10px; 
+    }
+
+    /* En el grid de 2 columnas, las cajas anchas y grandes siguen abarcando su espacio */
+    .bento-wide {
+        grid-column: span 2; 
+    }
+
+    .bento-large {
+        grid-column: span 2; 
+        grid-row: span 2;
+        min-height: 250px; 
+    }
+
+    .shelf-item img,
+    .shelf-item video {
+        max-height: none; 
+    }
+}
+
+@media (max-width: 480px) {
+    
+    /* En pantallas muy pequeñas (móviles verticales), forzamos una sola columna */
+    .bento-grid-container {
+        grid-template-columns: 1fr; 
+        gap: 10px;
+    }
+
+    /* Cuando hay una sola columna, todos los elementos deben ocupar 1 columna/fila */
+    .bento-wide,
+    .bento-large {
+        grid-column: span 1; 
+        grid-row: span 1; 
+        min-height: auto; 
+    }
+    
+    .header-wrapper {
+        margin-bottom: 20px;
+    }
 }
