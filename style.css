@@ -145,4 +145,69 @@ body {
     .header-wrapper {
         margin-bottom: 20px;
     }
+    /* --- ESTILOS DE LA BARRA DE BÚSQUEDA --- */
+
+.header__search {
+    margin-top: 25px; /* Separación de los enlaces de navegación */
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.search-bar__form {
+    display: flex;
+    align-items: center;
+    max-width: 400px; /* Limitar el ancho de la barra */
+    width: 100%;
+    border: 1px solid #ccc; /* Borde simple */
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: #fff;
+}
+
+.search-bar__query-input {
+    border: none;
+    outline: none;
+    flex-grow: 1;
+    padding: 8px 10px;
+    font-size: 11pt;
+    /* Usamos la misma tipografía para que se integre */
+    font-family: "Times New Roman", Times, serif; 
+    letter-spacing: -0.3px;
+    color: #333;
+    background: transparent;
+}
+
+.search-bar__actions {
+    display: flex;
+    align-items: center;
+}
+
+.icon-wrapper {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    color: #333; /* Color de los íconos */
+    display: flex;
+    align-items: center;
+}
+
+.icon-wrapper svg {
+    display: block;
+    width: 18px; 
+    height: 18px;
+}
+
+/* Ocultar el botón de reset por defecto */
+.search-bar__reset {
+    display: none; 
+}
+
+/* Estilos de enfoque para accesibilidad/visibilidad */
+.search-bar__query-input:focus {
+    box-shadow: none;
+}
+    
 }
