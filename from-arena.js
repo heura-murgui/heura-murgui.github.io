@@ -109,57 +109,88 @@
         return date.toLocaleDateString('en-US', options);
     }
 
-    // Render all items into the sidebar in chronological order
-    function renderShelf(items) {
-        const shelf = document.getElementById('shelf');
-        if (!shelf) return;
-        shelf.innerHTML = '';
+ // Render all items into the sidebar in chronological order
+function renderShelf(items) {
+    const shelf = document.getElementById('shelf');
+    if (!shelf) return;
+    shelf.innerHTML = '';
+    
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const wrapper = document.createElement('div');
+        wrapper.className = 'shelf-item';
         
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const wrapper = document.createElement('div');
-            wrapper.className = 'shelf-item';
-            
-            // LÓGICA DE CLASES BENTO PARA CSS GRID
-            if (i === 0) {
-                // El primer elemento (más reciente) es grande (2x2)
-                wrapper.classList.add('bento-large');
-            } else if (item.type === 'image') {
-                // Las imágenes ocupan más espacio horizontal (2x1)
-                wrapper.classList.add('bento-wide');
-            }
-            // Si es texto, enlace o video (no el primero), usa el tamaño estándar (1x1)
-
-            if (item.type === 'image') {
-                const img = document.createElement('img');
-                img.src = item.url;
-                img.alt = item.title || '';
-                wrapper.appendChild(img);
-            } else if (item.type === 'video') {
-                const video = document.createElement('video');
-                video.src = item.url;
-                video.controls = true;
-                video.style.width = '100%';
-                video.style.height = 'auto';
-                wrapper.appendChild(video);
-            } else if (item.type === 'text') {
-                const div = document.createElement('div');
-                div.innerHTML = item.content; // No añadir <p>, ya tiene HTML
-                wrapper.appendChild(div);
-            } else if (item.type === 'link') {
-                const a = document.createElement('a');
-                a.href = item.url;
-                a.textContent = item.title || item.url;
-                a.target = '_blank';
-                wrapper.appendChild(a);
-            }
-            const timeEl = document.createElement('time');
-            timeEl.textContent = formatDate(item.created_at);
-            timeEl.setAttribute('datetime', item.created_at);
-            wrapper.appendChild(timeEl);
-            shelf.appendChild(wrapper);
+        // LÓGICA DE CLASES BENTO PARA CSS GRID
+        if (i === 0) {
+            // El primer elemento (más reciente) es grande (2x2)
+            wrapper.classList.add('bento-large');
+        } else if (item.type === 'image') {
+            // Las imágenes ocupan más espacio horizontal (2x1)
+            wrapper.classList.add('bento-wide');
         }
+        // Si es texto, enlace o video (no el primero), usa el tamaño estándar (1x1)
+
+        // --- INICIO DE MODIFICACIONES ---
+
+        if (item.type === 'image') {
+            // 1. Crear el wrapper de relación de aspecto
+            const mediaWrapper = document.createElement('div');
+            mediaWrapper.classList.add('media-aspect-ratio'); 
+            
+            // 2. Crear la imagen
+            const img = document.createElement('img');
+            img.src = item.url;
+            img.alt = item.title || '';
+            
+            // 3. Añadir imagen al wrapper y wrapper al elemento principal
+            mediaWrapper.appendChild(img);
+            wrapper.appendChild(mediaWrapper);
+            
+        } else if (item.type === 'video') {
+            // 1. Crear el wrapper de relación de aspecto
+            const mediaWrapper = document.createElement('div');
+            mediaWrapper.classList.add('media-aspect-ratio'); 
+            
+            // 2. Crear el video
+            const video = document.createElement('video');
+            video.src = item.url;
+            
+            // 3. ¡ATRIBUTOS PARA AUTOPLAY Y SIN CONTROLES!
+            // Eliminamos: video.controls = true;
+            video.autoplay = true; 
+            video.loop = true;
+            video.muted = true; // Obligatorio para autoplay
+            video.playsinline = true; // Para móviles
+            
+            // 4. (Opcional) Ajustes de estilo que ya no son necesarios si usamos el CSS:
+            // video.style.width = '100%';
+            // video.style.height = 'auto';
+            
+            // 5. Añadir video al wrapper y wrapper al elemento principal
+            mediaWrapper.appendChild(video);
+            wrapper.appendChild(mediaWrapper);
+
+        } else if (item.type === 'text') {
+            const div = document.createElement('div');
+            div.innerHTML = item.content; 
+            wrapper.appendChild(div);
+        } else if (item.type === 'link') {
+            const a = document.createElement('a');
+            a.href = item.url;
+            a.textContent = item.title || item.url;
+            a.target = '_blank';
+            wrapper.appendChild(a);
+        }
+        
+        // --- FIN DE MODIFICACIONES ---
+
+        const timeEl = document.createElement('time');
+        timeEl.textContent = formatDate(item.created_at);
+        timeEl.setAttribute('datetime', item.created_at);
+        wrapper.appendChild(timeEl);
+        shelf.appendChild(wrapper);
     }
+}
     
     // Function to run everything
     async function updateFromArena() {

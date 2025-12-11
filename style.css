@@ -1,4 +1,6 @@
+/* =================================================== */
 /* --- ESTILOS DE FUENTE Y COLORES BÁSICOS --- */
+/* =================================================== */
 body, html {
     height: 100%;
     margin: 0;
@@ -7,7 +9,9 @@ body, html {
     color: #333; /* Color de texto oscuro */
 }
 
+/* =================================================== */
 /* --- ESTILOS DE CABECERA Y ENLACES --- */
+/* =================================================== */
 
 body {
     display: block; 
@@ -15,7 +19,6 @@ body {
 }
 
 .header-wrapper {
-    
     max-width: 1200px; 
     margin: 0 auto 40px auto; /* Centrar y margen inferior */
     padding: 0 20px; 
@@ -24,7 +27,10 @@ body {
     font-family: "Times New Roman", Times, serif;
     letter-spacing: -0.3px;
 }
+
+/* =================================================== */
 /* --- ESTILOS BENTO GRID (ESCRITORIO: 4 COLUMNAS) --- */
+/* =================================================== */
 
 .bento-grid-container {
     /* Cuadrícula de 4 columnas por defecto (para pantallas grandes) */
@@ -46,25 +52,60 @@ body {
     
     padding: 15px;
     border-radius: 0px;
-    min-height: 150px; 
+    
+    /* AJUSTE CLAVE: Eliminamos la altura mínima fija. 
+       Ahora la altura la definirá el contenido, especialmente el aspect-ratio. */
+    min-height: auto; 
     
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Para empujar el contenido hacia arriba/abajo */
+    justify-content: space-between; 
     overflow: hidden;
     text-align: left; 
-    
 }
 
-/* Imágenes y Videos dentro de las cajas */
-.shelf-item img,
-.shelf-item video {
+/* --- ESTILOS DEL CONTENIDO MULTIMEDIA (IMÁGENES Y VIDEOS) --- */
+
+/* Nota: Los estilos anteriores de .shelf-item img/video han sido reemplazados 
+   por el contenedor .media-aspect-ratio para manejar la proporción. */
+
+/* Contenedor principal que reserva el espacio y define el Aspect Ratio */
+.media-aspect-ratio {
+    width: 100%; 
+    overflow: hidden; 
+    
+    /* Relación de aspecto por defecto: 16:9 */
+    aspect-ratio: 16 / 9; 
+    
+    /* Para asegurar que la imagen/video rellene el espacio */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px; /* Separación con el título/texto inferior */
+}
+
+/* Modificadores de relación de aspecto */
+.media-aspect-ratio.square {
+    aspect-ratio: 1 / 1; /* Cuadrado */
+}
+
+.media-aspect-ratio.portrait {
+    aspect-ratio: 3 / 4; /* Vertical */
+}
+
+/* El elemento media (img/video) dentro del contenedor */
+.media-aspect-ratio img,
+.media-aspect-ratio video {
     width: 100%;
-    height: auto;
-    display: block;
-    object-fit: cover;
-    margin-bottom: 10px;
-    max-height: 250px; 
+    height: 100%;
+    
+    /* Asegura que la imagen/video cubra el espacio */
+    object-fit: cover; 
+    
+    margin-bottom: 0; 
+    
+    /* Deshabilita clics en el video (importante para videos sin controles) */
+    pointer-events: none; 
 }
 
 /* --- CLASES DE TAMAÑO BENTO (Escritorio) --- */
@@ -78,7 +119,8 @@ body {
 .bento-large {
     grid-column: span 2;
     grid-row: span 2;
-    min-height: 315px;
+    /* AJUSTE: Quitamos el min-height fijo y ahora depende de sus contenidos */
+    min-height: auto; 
 }
 
 /* Estilo para la fecha de creación */
@@ -113,13 +155,10 @@ body {
     .bento-large {
         grid-column: span 2; 
         grid-row: span 2;
-        min-height: 250px; 
+        /* AJUSTE: min-height: auto para seguir usando el aspect ratio */
+        min-height: auto; 
     }
 
-    .shelf-item img,
-    .shelf-item video {
-        max-height: none; 
-    }
 }
 
 @media (max-width: 480px) {
