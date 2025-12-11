@@ -1,33 +1,29 @@
 /* --- ESTILOS DE FUENTE Y COLORES BÁSICOS --- */
 body, html {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font-size: 11pt;
-    font-family: "Times New Roman", Times, serif;
-    letter-spacing: -0.3px;
-    background-color: #f7f7f7; /* Fondo claro */
-    color: #333; /* Color de texto oscuro */
+    height: 100%;
+    margin: 0;
+    padding: 0; 
+    /* ... el resto de propiedades ... */
+    color: #333; /* Color de texto oscuro */
 }
 
 /* --- ESTILOS DE CABECERA Y ENLACES --- */
 
 body {
     display: block; 
-    padding: 0;
-    padding-top: 20px; 
+    padding-top: 20px;
 }
 
 .header-wrapper {
-    max-width: 1200px; 
-    margin: 0 auto 40px auto; /* Centrar y margen inferior */
-    padding: 0 20px; 
+    
+    max-width: 1200px; 
+    margin: 0 auto 40px auto; /* Centrar y margen inferior */
+    padding: 0 20px; 
     text-align: center;
     font-size: 11pt;
-    font-family: "Times New Roman", Times, serif;
-    letter-spacing: -0.3px;
+    font-family: "Times New Roman", Times, serif;
+    letter-spacing: -0.3px;
 }
-
 /* --- ESTILOS BENTO GRID (ESCRITORIO: 4 COLUMNAS) --- */
 
 .bento-grid-container {
@@ -43,7 +39,7 @@ body {
 
 .shelf-item {
     /* Estilo base de la caja bento */
-    background-color: #f96868;
+    background-color: #ffffff;
     
     /* AJUSTE: Eliminar marco */
     border: none; 
