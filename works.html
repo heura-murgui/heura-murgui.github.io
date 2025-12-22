@@ -26,7 +26,6 @@
             height: 100vh !important; 
         }
 
-        /* SISTEMA DE FILTROS */
         #filters {
             position: fixed;
             left: 20px;
@@ -85,10 +84,6 @@
             border: none;
             padding: 5px 10px;
             font-family: inherit;
-        }
-
-        #back-to-top:hover {
-            color: white;
         }
 
         header {
@@ -177,49 +172,17 @@
         const CHANNEL_SLUG = 'angela-test'; 
         const API_BASE = 'https://api.are.na/v2';
 
-        // Botón volver arriba
         $('#back-to-top').on('click', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Lógica de filtrado
-        $('#filters li').on('click', function() {
-            const filter = $(this).attr('data-filter');
-            $('#filters li').removeClass('active');
-            $(this).addClass('active');
-
-            if (filter === 'all') {
-                $('.work-item').fadeIn(400);
-            } else {
-                $('.work-item').each(function() {
-                    const itemTags = $(this).attr('data-tags') || "";
-                    // El filtrado busca la coincidencia dentro del Alt Text recolectado
-                    if (itemTags.includes(filter)) {
-                        $(this).fadeIn(400);
-                    } else {
-                        $(this).fadeOut(400);
-                    }
-                });
-            }
-        });
-
-        // Obtener bloques de Are.na
-        async function fetchArenaBlocks() {
-            try {
-                const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=50&direction=desc`);
-                const data = await response.json();
-                return data.contents.filter(block => block.class === 'Image');
-            } catch (error) {
-                console.error('Error al conectar con Are.na:', error);
-                return [];
-            }
-        }
-
-        // Lógica de posicionamiento y caos controlado
-        function applyChaosLogic(element, index) {
+        // Función de posicionamiento reutilizable
+        function positionElement(element, index) {
             const $el = $(element);
             const sign = Math.random() < 0.5 ? '-' : '+';
             const posx = Math.random() * ($(window).width() - 350);
+            
+            // Posición vertical basada en el índice actual del filtro
             const baseTop = index * 300; 
             const randomVariation = Math.random() * 250; 
             const posy = baseTop + randomVariation;
@@ -232,6 +195,49 @@
                 'opacity': 1
             });
 
+            return posy;
+        }
+
+        // Lógica de filtrado con reordenación arriba
+        $('#filters li').on('click', function() {
+            const filter = $(this).attr('data-filter');
+            $('#filters li').removeClass('active');
+            $(this).addClass('active');
+
+            let visibleCount = 0;
+            let maxBottom = 0;
+
+            $('.work-item').each(function() {
+                const $item = $(this);
+                const itemTags = $item.attr('data-tags') || "";
+
+                if (filter === 'all' || itemTags.includes(filter)) {
+                    $item.show();
+                    // Reposicionamos usando el contador de visibles actual
+                    const currentTop = positionElement($item, visibleCount);
+                    if (currentTop + 400 > maxBottom) maxBottom = currentTop + 400;
+                    visibleCount++;
+                } else {
+                    $item.hide();
+                }
+            });
+
+            $('#arena-container').css('height', (maxBottom + 400) + 'px');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        });
+
+        async function fetchArenaBlocks() {
+            try {
+                const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=50&direction=desc`);
+                const data = await response.json();
+                return data.contents.filter(block => block.class === 'Image');
+            } catch (error) {
+                console.error('Error:', error);
+                return [];
+            }
+        }
+
+        function applyInteractions($el) {
             $el.draggable({ stack: ".work-item" });
 
             $el.hover(
@@ -250,28 +256,21 @@
                 }
             );
 
-            $el.on('click', function(e) {
+            $el.on('click', function() {
                 if ($(this).hasClass('ui-draggable-dragging')) return;
                 const imgSrc = $(this).find('img').attr('src');
                 $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).show();
                 $('body').addClass('lock-scroll');
-                $('#info').hide();
-                $('#filters').hide();
-                $('#back-to-top').hide();
-                $('#fullscreen-viewer').scrollTop(0);
+                $('#info, #filters, #back-to-top').hide();
             });
         }
 
-        // Cerrar visor fullscreen
         $('#fullscreen-viewer').on('click', function() {
             $(this).hide().empty();
             $('body').removeClass('lock-scroll');
-            $('#info').show();
-            $('#filters').show();
-            $('#back-to-top').show();
+            $('#info, #filters, #back-to-top').show();
         });
 
-        // Inicialización
         async function init() {
             const blocks = await fetchArenaBlocks();
             const $container = $('#arena-container');
@@ -280,19 +279,10 @@
             blocks.forEach((block, i) => {
                 const imageUrl = block.image.display.url;
                 const title = block.title || "untitled";
-                
-                // CAMBIO: Extraemos el valor de "Alt Text" del bloque
-                const altText = block.image.alt || "";
-                
-                const date = new Date(block.created_at).toLocaleDateString('en-EN', { 
-                    year: 'numeric', 
-                    month: 'numeric', 
-                    day: 'numeric' 
-                });
-                
+                const altText = block.image.alt || ""; // Leemos de Alt Text
+                const date = new Date(block.created_at).toLocaleDateString('en-EN', { year: 'numeric', month: 'numeric', day: 'numeric' });
                 const description = block.description || "";
                 
-                // Mantenemos la descripción para el hover, pero usamos el altText para el filtrado
                 const html = `
                     <li class="work-item" 
                         data-title="${title}" 
@@ -305,13 +295,10 @@
                 
                 const $newItem = $(html);
                 $container.append($newItem);
+                applyInteractions($newItem);
                 
-                applyChaosLogic($newItem, i);
-
-                const currentBottom = parseFloat($newItem.css('top')) + 400;
-                if (currentBottom > maxBottom) {
-                    maxBottom = currentBottom;
-                }
+                const currentTop = positionElement($newItem, i);
+                if (currentTop + 400 > maxBottom) maxBottom = currentTop + 400;
             });
 
             $container.css('height', (maxBottom + 400) + 'px');
@@ -320,6 +307,5 @@
         init();
     });
     </script>
-
 </body>
 </html>
