@@ -206,5 +206,39 @@
        </main>  
     </div>
 
+<script>
+    const closeBtn = document.querySelector('.btn-close');
+    const originalWindow = document.querySelector('.window-wrapper');
+    let count = 0;
+    let offset = 0;
+
+    closeBtn.addEventListener('click', () => {
+        // Cambiamos el z-index para que las nuevas ventanas se vean
+        originalWindow.style.zIndex = "1";
+        
+        // Iniciamos un intervalo para crear ventanas infinitas
+        const interval = setInterval(() => {
+            if (count > 100) clearInterval(interval); // Se detiene tras 100 ventanas por seguridad
+
+            // Clonamos la ventana original
+            const clone = originalWindow.cloneNode(true);
+            
+            // Calculamos la nueva posición
+            offset += 15; // Cuántos píxeles se desplaza cada una
+            
+            // Aplicamos los estilos a la copia
+            clone.style.top = `calc(50% + ${offset}px)`;
+            clone.style.left = `calc(40% + ${offset}px)`;
+            clone.style.zIndex = count + 1;
+            
+            // Quitamos el evento de clic a los botones de los clones para evitar caos extra
+            clone.querySelector('.btn-close').style.cursor = 'default';
+            
+            document.body.appendChild(clone);
+            count++;
+        }, 100); // Crea una ventana cada 100ms
+    });
+</script>
+
 </body>
 </html>
