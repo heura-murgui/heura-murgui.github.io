@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HM</title>
+    <link rel="icon" href="assets/faviribbon.ico">
     
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
@@ -25,15 +26,17 @@
             height: 100vh !important; 
         }
 
-        /* SISTEMA DE FILTROS A LA IZQUIERDA */
+        /* SISTEMA DE FILTROS */
         #filters {
             position: fixed;
             left: 20px;
             top: 50%;
+            transform: translateY(-50%);
             z-index: 9999;
             list-style: none;
             padding: 0;
             margin: 0;
+            text-transform: lowercase;
         }
 
         #filters li {
@@ -41,26 +44,33 @@
             font-size: 11pt;
             cursor: pointer;
             color: black;
-         
+            /*transition: all 0.2s ease;*/
         }
 
         #filters li:hover, #filters li.active {
-            color: red;
-            padding-left: 5px;
-        }
+            color: #ff0000;
+            text-shadow: 1px 1px 1px #ff0000, 1px -1px 1px #ff0000, -1px 1px 1px #ff0000, -1px -1px 1px #ff0000;
+        } 
 
         #info {
             position: fixed;
             top: 20px;
             left: 20px;
-            z-index: 9998; /* Un nivel debajo de los filtros por si coinciden */
-            font-size: 24pt;
+            z-index: 9998;
+            font-size: 54pt;
             font-weight: 700;
             pointer-events: none;
             color: #1a1a1a;
             text-transform: lowercase;
-            max-width: 500px;
+            max-width: 1000px;
             line-height: 1.1;
+        }
+
+        .info-desc {
+            font-size: 14pt;
+            font-weight: 400;
+            margin-top: 8px;
+            color: #444;
         }
 
         #back-to-top {
@@ -82,12 +92,6 @@
             color: white;
         }
 
-        .info-desc {
-            font-size: 14pt;
-            font-weight: 400;
-            margin-top: 8px;
-            color: #444;
-        }
 
         header {
             position: fixed;
@@ -106,16 +110,15 @@
             padding: 0;
             position: relative;
             width: 100%;
-            min-height: 100vh; 
-            overflow: hidden !important;
+            /* El alto se ajustará dinámicamente con JS */
         }
 
         .work-item {
             position: absolute;
             width: 320px;
             z-index: 10;
-            opacity: 0;
-            
+            opacity: 0; /* Empieza oculto para la animación inicial */
+            cursor: zoom-in;
         }
 
         .thumb {
@@ -177,15 +180,14 @@
         const CHANNEL_SLUG = 'angela-test'; 
         const API_BASE = 'https://api.are.na/v2';
 
+        // Botón volver arriba
         $('#back-to-top').on('click', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // LÓGICA DE FILTRADO
+        // Lógica de filtrado
         $('#filters li').on('click', function() {
             const filter = $(this).attr('data-filter');
-            
-            // Estética de botones
             $('#filters li').removeClass('active');
             $(this).addClass('active');
 
@@ -203,23 +205,35 @@
             }
         });
 
+        // Obtener bloques de Are.na
         async function fetchArenaBlocks() {
             try {
+                // direction=desc asegura que el API nos de lo más nuevo primero
                 const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=50&direction=desc`);
                 const data = await response.json();
                 return data.contents.filter(block => block.class === 'Image');
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al conectar con Are.na:', error);
                 return [];
             }
         }
 
-        function applyChaosLogic(element) {
+        // Lógica de posicionamiento y caos controlado por orden
+        function applyChaosLogic(element, index) {
             const $el = $(element);
             const sign = Math.random() < 0.5 ? '-' : '+';
+            
+            // Posición horizontal aleatoria
             const posx = Math.random() * ($(window).width() - 350);
-            const posy = Math.random() * ($(window).height() * 3);
-            const rota = (Math.random() * 20).toFixed(2);
+            
+            // POSICIÓN VERTICAL BASADA EN EL ORDEN (Index)
+            // Cada bloque tiene una franja de unos 300px + un extra aleatorio
+            const baseTop = index * 300; 
+            const randomVariation = Math.random() * 250; 
+            const posy = baseTop + randomVariation;
+
+            // Rotación aleatoria
+            const rota = (Math.random() * 15).toFixed(2);
 
             $el.css({
                 'left': posx + 'px',
@@ -228,8 +242,10 @@
                 'opacity': 1
             });
 
+            // Hacerlo arrastrable
             $el.draggable({ stack: ".work-item" });
 
+            // Mostrar información al pasar el mouse
             $el.hover(
                 function() { 
                     const title = $(this).attr('data-title');
@@ -246,37 +262,43 @@
                 }
             );
 
+            // Ver en pantalla completa
             $el.on('click', function(e) {
                 if ($(this).hasClass('ui-draggable-dragging')) return;
                 const imgSrc = $(this).find('img').attr('src');
                 $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).show();
                 $('body').addClass('lock-scroll');
                 $('#info').hide();
-                $('#filters').hide(); // Ocultar filtros en fullscreen
+                $('#filters').hide();
                 $('#back-to-top').hide();
                 $('#fullscreen-viewer').scrollTop(0);
             });
         }
 
+        // Cerrar visor fullscreen
         $('#fullscreen-viewer').on('click', function() {
             $(this).hide().empty();
             $('body').removeClass('lock-scroll');
             $('#info').show();
-            $('#filters').show(); // Mostrar filtros al salir
+            $('#filters').show();
             $('#back-to-top').show();
         });
 
+        // Inicialización
         async function init() {
             const blocks = await fetchArenaBlocks();
             const $container = $('#arena-container');
             let maxBottom = 0;
 
-            blocks.forEach(block => {
+            blocks.forEach((block, i) => {
                 const imageUrl = block.image.display.url;
                 const title = block.title || "untitled";
-                const date = new Date(block.created_at).toLocaleDateString('en-EN', { year: 'numeric', month: 'numeric', day: 'numeric' });
+                const date = new Date(block.created_at).toLocaleDateString('en-EN', { 
+                    year: 'numeric', 
+                    month: 'numeric', 
+                    day: 'numeric' 
+                });
                 
-                // Extraemos la descripción para las tags
                 const description = block.description || "";
                 
                 const html = `
@@ -285,20 +307,25 @@
                         data-date="${date}" 
                         data-description="${description}"
                         data-tags="${description}"> 
-                        <img class="thumb" src="${imageUrl}" />
+                        <img class="thumb" src="${imageUrl}" alt="${title}" />
                     </li>
                 `;
+                
                 const $newItem = $(html);
                 $container.append($newItem);
-                applyChaosLogic($newItem);
+                
+                // Pasamos 'i' para que sepa en qué orden vertical ir
+                applyChaosLogic($newItem, i);
 
-                const currentTop = parseFloat($newItem.css('top'));
-                if (currentTop > maxBottom) {
-                    maxBottom = currentTop;
+                // Calcular el punto más bajo para que el scroll sea correcto
+                const currentBottom = parseFloat($newItem.css('top')) + 400;
+                if (currentBottom > maxBottom) {
+                    maxBottom = currentBottom;
                 }
             });
 
-            $container.css('height', (maxBottom + 600) + 'px');
+            // Asignar el alto final al contenedor
+            $container.css('height', (maxBottom + 400) + 'px');
         }
 
         init();

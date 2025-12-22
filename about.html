@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JTH</title>
+    <title>HM</title>
+    <link rel="icon" href="assets/faviribbon.ico">
     <style>
         html, body {
             height: 100%;
@@ -19,30 +20,39 @@
             color: #1a1a1a;
             background-color: #ffffff;
             
-            /* Configuración para esquina superior derecha */
+            /* Posiciona el contenedor principal a la derecha y arriba */
             display: flex;
-            justify-content: flex-end; /* Alinea a la derecha */
-            align-items: flex-start;  /* Alinea arriba */
-            text-align: right;         /* Alinea el texto a la derecha */
-            /* Margen de seguridad */
+            justify-content: flex-end; 
+            align-items: flex-start;  
+            
+            /* Margen de seguridad desde los bordes de la ventana */
             padding: 30px;
             box-sizing: border-box;
         }
 
-        
+        /* Contenedor que agrupa navegación y descripción */
+        .main-container {
+            display: flex;
+            flex-direction: column; /* Apila menú arriba y texto abajo */
+            align-items: flex-end;   /* Alinea el contenido interno a la derecha */
+            text-align: right;       /* Alinea las líneas de texto a la derecha */
+            max-width: 450px;        /* Controla el ancho para que no ocupe toda la pantalla */
+        }
+
+        nav {
+            margin-bottom: 20px;     /* Espacio entre el menú y la descripción */
+        }
 
         nav li {
             list-style: none; 
             padding: 0;
             margin: 0;
-           
         }
 
         a {
             text-decoration: none; 
             color: rgb(255, 0, 0);   
             white-space: nowrap;
-               
         }
 
         a:hover {
@@ -51,56 +61,149 @@
         }
 
         .description {
-            margin-top: 0px;      /* Espacio respecto al menú */
-            max-width: 1000px;      /* Controlas el ancho del bloque de texto */
-            
-            /* Ajusta este padding para desplazar el texto hacia la IZQUIERDA */
-            padding-right: 190px;    
-            
+            text-transform: lowercase;
+            /* Eliminamos el padding-right anterior para evitar el solapamiento */
         }
 
         #home { text-decoration: none; color: black; }
 
-       ::selection {
-    background: transparent;
-    color: #a2a2a2;
-    text-decoration: underline wavy; /* Algunos navegadores permiten esto */
+        ::selection {
+            background: transparent;
+            color: #a2a2a2;
+            text-decoration: underline wavy;
+        }
+
+        /* Contenedor para centrar la ventana en pantalla */
+.window-wrapper {
+    position: fixed;
+    top: 50%;
+    left: 40%; /* Ajustado un poco a la izquierda para no chocar con tu texto */
+    transform: translate(-50%, -50%);
+    z-index: -1; /* Para que quede detrás o al nivel del texto según prefieras */
 }
 
+/* Cuerpo de la ventana */
+.win98-window {
+    background-color: #c0c0c0;
+    border: 0px solid #000;
+    box-shadow: inset 1px 1px #dfdfdf, 1px 1px #000;
+    padding: 2px;
+    width: fit-content;
+}
+
+/* Barra de título azul */
+.win98-title-bar {
+    justify-content: space-between;
+    display: flex;
+    align-items: baseline;
+    /*background: linear-gradient(90deg, #800000, #606161);
+    background-color: #c0c0c0;
+    color: rgb(0, 0, 0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 5px 3px 8px;
+    height: 50px; /* Barra superior grande como pediste */
+}
+
+
+
+/* Botones de control */
+.title-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.win98-btn {
+    font-family: "Times New Roman", Times, serif;
+    width: 48px;
+    height: 48px;
+    background-color: #c0c0c0;
+    /*border: 1px solid #000;
+    box-shadow: inset 1px 1px #ffffff;*/
+    font-size: 30pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.win98-btn:active {
+    box-shadow: inset 1px 1px #000;
+}
+
+/* Espacio de la imagen */
+.win98-content {
+   border: 1px solid #808080;
+    background-color: #fff;
+    margin: 4px;
+    display: flex;
+    /* Modifica estos valores para cambiar el tamaño de la ventana */
+    width: 300px;  
+    height: 400px; 
+    overflow: hidden; /* Evita que la imagen se salga si es muy grande */
+}
+
+.win98-content img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
     </style>
 </head>
 <body>
 
-    <header>
-       
-        <nav>
-            <li><a href="index.html" id="home">Heura Murgui</a></li>
-            <li><a href="works.html">works</a></li>
-            <li><a href="about.html">about</a></li>
-            <li><a href="mailto:heuramurgui@gmail.com">heuramurgui (at) gmail (dot) com</a></li>
-        </nav>
-    </header>
-
-    <main>
-       <div class="description">
-            es una fotógrafa valenciana cuya obra explora la experiencia humana a través 
-            de una mezcla dinámica de paisajes abstractos y fotografía callejera con conciencia social. 
-            Influenciado por el cine y la literatura, utiliza lentes gran angular y transiciones entre el color y el blanco y negro 
-            para capturar imágenes con una fuerte carga emocional y autenticidad.
-            
-            <br><br><br>
-            
-            <i>is a Valencian photographer whose work explores the human experience through a 
-            dynamic blend of abstract landscapes and socially conscious street photography. Influenced by 
-            cinema and literature, he utilizes wide-angle lenses and transitions between color
-             and black and white to capture images with profound emotional resonance and authenticity.</i>
-            
-            <br><br><br>
-            
-            >>> based in Valencia, Spain
+    <div class="window-wrapper">
+    <div class="win98-window">
+        <div class="win98-title-bar">
+            <div class="title-text">IMG_4150.jpg</div>
+            <div class="title-controls">
+                <button class="win98-btn">_</button>
+                <button class="win98-btn">□</button>
+                <button class="win98-btn btn-close">x</button>
+            </div>
         </div>
-   </main>  
+        <div class="win98-content">
+            <img src="assets/heura-retouch.png" alt="Placeholder">
+        </div>
+    </div>
+</div>
 
-  
+    <div class="main-container">
+        <header>
+            <nav>
+                <li><a href="index.html" id="home">Heura Murgui</a></li>
+                <li><a href="works.html">works</a></li>
+                <li><a href="about.html">about</a></li>
+                <li><a href="mailto:heuramurgui@gmail.com">heuramurgui (at) gmail (dot) com</a></li>
+            </nav>
+        </header>
+
+        <main>
+           <div class="description">
+                es una fotógrafa valenciana cuya obra explora la experiencia humana a través 
+                de una mezcla dinámica de paisajes abstractos y fotografía callejera con conciencia social. 
+                Influenciado por el cine y la literatura, utiliza lentes gran angular y transiciones entre el color y el blanco y negro 
+                para capturar imágenes con una fuerte carga emocional y autenticidad.
+                
+                <br><br><br>
+                
+                <i>is a Valencian photographer whose work explores the human experience through a 
+                dynamic blend of abstract landscapes and socially conscious street photography. Influenced by 
+                cinema and literature, he utilizes wide-angle lenses and transitions between color
+                 and black and white to capture images with profound emotional resonance and authenticity.</i>
+                
+                <br><br><br>
+                
+                >>> based in Valencia, Spain
+                <br><br><br><br><br><br><br><br><br>
+                <a href="https://www.instagram.com/heuramurgui/" target="_blank">@heuramurgui</a>
+                <br>
+                <a href="https://www.linkedin.com/in/heura-murgui" target="_blank">LinkedIn</a>
+            </div>
+       </main>  
+    </div>
+
 </body>
 </html>
