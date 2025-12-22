@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HM</title>
+    
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            font-family: "Times New Roman", Times, serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            text-transform: uppercase;
+        }
+
+        body.lock-scroll {
+            overflow: hidden !important;
+            height: 100vh !important; 
+        }
+
+        /* SISTEMA DE FILTROS A LA IZQUIERDA */
+        #filters {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            z-index: 9999;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #filters li {
+            margin: 10px 0;
+            font-size: 11pt;
+            cursor: pointer;
+            color: black;
+         
+        }
+
+        #filters li:hover, #filters li.active {
+            color: red;
+            padding-left: 5px;
+        }
+
+        #info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9998; /* Un nivel debajo de los filtros por si coinciden */
+            font-size: 24pt;
+            font-weight: 700;
+            pointer-events: none;
+            color: #1a1a1a;
+            text-transform: lowercase;
+            max-width: 500px;
+            line-height: 1.1;
+        }
+
+        #back-to-top {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            font-size: 11pt;
+            color: black;
+            cursor: pointer;
+            text-transform: uppercase;
+            background: red;
+            border: none;
+            padding: 5px 10px;
+            font-family: inherit;
+        }
+
+        #back-to-top:hover {
+            color: white;
+        }
+
+        .info-desc {
+            font-size: 14pt;
+            font-weight: 400;
+            margin-top: 8px;
+            color: #444;
+        }
+
+        header {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+        }
+
+        nav li { list-style: none; margin: 0; padding: 0; }
+        a { text-decoration: none; color: rgb(255, 0, 0); }
+        a:hover { color: #ffffff; background-color: rgb(110, 108, 108); }
+
+        .container-chaos {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            width: 100%;
+            min-height: 100vh; 
+            overflow: hidden !important;
+        }
+
+        .work-item {
+            position: absolute;
+            width: 320px;
+            z-index: 10;
+            opacity: 0;
+            
+        }
+
+        .thumb {
+            width: 100%;
+            height: auto;
+            display: block;
+            pointer-events: none;
+        }
+
+        #fullscreen-viewer {
+            display: none; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            z-index: 10000;
+            overflow-y: scroll; 
+            cursor: zoom-out;
+        }
+
+        #home { text-decoration: none; color: black; }
+        #fullscreen-viewer img { width: 100%; height: auto; display: block; }
+        .ui-draggable-dragging { cursor: grabbing !important; }
+    </style>
+</head>
+<body>
+
+    <div id="info"></div>
+    
+    <ul id="filters">
+        <li class="active" data-filter="all">#all</li>
+        <li data-filter="#35mm">#35mm</li>
+        <li data-filter="#editorial">#editorial</li>
+        <li data-filter="#fashion">#fashion</li>
+        <li data-filter="#product">#product</li>
+    </ul>
+
+    <button id="back-to-top">↑ back to top</button>
+
+    <div id="fullscreen-viewer"></div>
+
+    <header>
+        <nav>
+            <li><a href="indexjt.html" id="home">Heura Murgui</a></li>
+            <li><a href="worksjt.html">works</a></li>
+            <li><a href="aboutjt.html">about</a></li>
+            <li><a href="mailto:heuramurgui@gmail.com">heuramurgui (at) gmail (dot) com</a></li>
+        </nav>
+    </header>
+
+    <main>
+        <ul class="container-chaos" id="arena-container"></ul>
+    </main>
+
+    <script>
+    $(function() {
+        const CHANNEL_SLUG = 'angela-test'; 
+        const API_BASE = 'https://api.are.na/v2';
+
+        $('#back-to-top').on('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // LÓGICA DE FILTRADO
+        $('#filters li').on('click', function() {
+            const filter = $(this).attr('data-filter');
+            
+            // Estética de botones
+            $('#filters li').removeClass('active');
+            $(this).addClass('active');
+
+            if (filter === 'all') {
+                $('.work-item').fadeIn(400);
+            } else {
+                $('.work-item').each(function() {
+                    const itemTags = $(this).attr('data-tags') || "";
+                    if (itemTags.includes(filter)) {
+                        $(this).fadeIn(400);
+                    } else {
+                        $(this).fadeOut(400);
+                    }
+                });
+            }
+        });
+
+        async function fetchArenaBlocks() {
+            try {
+                const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=50&direction=desc`);
+                const data = await response.json();
+                return data.contents.filter(block => block.class === 'Image');
+            } catch (error) {
+                console.error('Error:', error);
+                return [];
+            }
+        }
+
+        function applyChaosLogic(element) {
+            const $el = $(element);
+            const sign = Math.random() < 0.5 ? '-' : '+';
+            const posx = Math.random() * ($(window).width() - 350);
+            const posy = Math.random() * ($(window).height() * 3);
+            const rota = (Math.random() * 20).toFixed(2);
+
+            $el.css({
+                'left': posx + 'px',
+                'top': posy + 'px',
+                'transform': `rotate(${sign}${rota}deg)`,
+                'opacity': 1
+            });
+
+            $el.draggable({ stack: ".work-item" });
+
+            $el.hover(
+                function() { 
+                    const title = $(this).attr('data-title');
+                    const date = $(this).attr('data-date');
+                    const desc = $(this).attr('data-description');
+                    let infoHtml = `<div>${title} <span style="font-weight:400; font-size:18pt;">(${date})</span></div>`;
+                    if (desc && desc !== "null") infoHtml += `<div class="info-desc">${desc}</div>`;
+                    $('#info').html(infoHtml);
+                    $(this).css('z-index', '9000');
+                }, 
+                function() { 
+                    $('#info').html('');
+                    $(this).css('z-index', '10');
+                }
+            );
+
+            $el.on('click', function(e) {
+                if ($(this).hasClass('ui-draggable-dragging')) return;
+                const imgSrc = $(this).find('img').attr('src');
+                $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).show();
+                $('body').addClass('lock-scroll');
+                $('#info').hide();
+                $('#filters').hide(); // Ocultar filtros en fullscreen
+                $('#back-to-top').hide();
+                $('#fullscreen-viewer').scrollTop(0);
+            });
+        }
+
+        $('#fullscreen-viewer').on('click', function() {
+            $(this).hide().empty();
+            $('body').removeClass('lock-scroll');
+            $('#info').show();
+            $('#filters').show(); // Mostrar filtros al salir
+            $('#back-to-top').show();
+        });
+
+        async function init() {
+            const blocks = await fetchArenaBlocks();
+            const $container = $('#arena-container');
+            let maxBottom = 0;
+
+            blocks.forEach(block => {
+                const imageUrl = block.image.display.url;
+                const title = block.title || "untitled";
+                const date = new Date(block.created_at).toLocaleDateString('en-EN', { year: 'numeric', month: 'numeric', day: 'numeric' });
+                
+                // Extraemos la descripción para las tags
+                const description = block.description || "";
+                
+                const html = `
+                    <li class="work-item" 
+                        data-title="${title}" 
+                        data-date="${date}" 
+                        data-description="${description}"
+                        data-tags="${description}"> 
+                        <img class="thumb" src="${imageUrl}" />
+                    </li>
+                `;
+                const $newItem = $(html);
+                $container.append($newItem);
+                applyChaosLogic($newItem);
+
+                const currentTop = parseFloat($newItem.css('top'));
+                if (currentTop > maxBottom) {
+                    maxBottom = currentTop;
+                }
+            });
+
+            $container.css('height', (maxBottom + 600) + 'px');
+        }
+
+        init();
+    });
+    </script>
+
+</body>
+</html>
