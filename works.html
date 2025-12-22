@@ -44,7 +44,6 @@
             font-size: 11pt;
             cursor: pointer;
             color: black;
-            /*transition: all 0.2s ease;*/
         }
 
         #filters li:hover, #filters li.active {
@@ -92,7 +91,6 @@
             color: white;
         }
 
-
         header {
             position: fixed;
             bottom: 20px;
@@ -110,14 +108,13 @@
             padding: 0;
             position: relative;
             width: 100%;
-            /* El alto se ajustará dinámicamente con JS */
         }
 
         .work-item {
             position: absolute;
             width: 320px;
             z-index: 10;
-            opacity: 0; /* Empieza oculto para la animación inicial */
+            opacity: 0; 
             cursor: zoom-in;
         }
 
@@ -196,6 +193,7 @@
             } else {
                 $('.work-item').each(function() {
                     const itemTags = $(this).attr('data-tags') || "";
+                    // El filtrado busca la coincidencia dentro del Alt Text recolectado
                     if (itemTags.includes(filter)) {
                         $(this).fadeIn(400);
                     } else {
@@ -208,7 +206,6 @@
         // Obtener bloques de Are.na
         async function fetchArenaBlocks() {
             try {
-                // direction=desc asegura que el API nos de lo más nuevo primero
                 const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=50&direction=desc`);
                 const data = await response.json();
                 return data.contents.filter(block => block.class === 'Image');
@@ -218,21 +215,14 @@
             }
         }
 
-        // Lógica de posicionamiento y caos controlado por orden
+        // Lógica de posicionamiento y caos controlado
         function applyChaosLogic(element, index) {
             const $el = $(element);
             const sign = Math.random() < 0.5 ? '-' : '+';
-            
-            // Posición horizontal aleatoria
             const posx = Math.random() * ($(window).width() - 350);
-            
-            // POSICIÓN VERTICAL BASADA EN EL ORDEN (Index)
-            // Cada bloque tiene una franja de unos 300px + un extra aleatorio
             const baseTop = index * 300; 
             const randomVariation = Math.random() * 250; 
             const posy = baseTop + randomVariation;
-
-            // Rotación aleatoria
             const rota = (Math.random() * 15).toFixed(2);
 
             $el.css({
@@ -242,10 +232,8 @@
                 'opacity': 1
             });
 
-            // Hacerlo arrastrable
             $el.draggable({ stack: ".work-item" });
 
-            // Mostrar información al pasar el mouse
             $el.hover(
                 function() { 
                     const title = $(this).attr('data-title');
@@ -262,7 +250,6 @@
                 }
             );
 
-            // Ver en pantalla completa
             $el.on('click', function(e) {
                 if ($(this).hasClass('ui-draggable-dragging')) return;
                 const imgSrc = $(this).find('img').attr('src');
@@ -293,6 +280,10 @@
             blocks.forEach((block, i) => {
                 const imageUrl = block.image.display.url;
                 const title = block.title || "untitled";
+                
+                // CAMBIO: Extraemos el valor de "Alt Text" del bloque
+                const altText = block.image.alt || "";
+                
                 const date = new Date(block.created_at).toLocaleDateString('en-EN', { 
                     year: 'numeric', 
                     month: 'numeric', 
@@ -301,12 +292,13 @@
                 
                 const description = block.description || "";
                 
+                // Mantenemos la descripción para el hover, pero usamos el altText para el filtrado
                 const html = `
                     <li class="work-item" 
                         data-title="${title}" 
                         data-date="${date}" 
                         data-description="${description}"
-                        data-tags="${description}"> 
+                        data-tags="${altText}"> 
                         <img class="thumb" src="${imageUrl}" alt="${title}" />
                     </li>
                 `;
@@ -314,17 +306,14 @@
                 const $newItem = $(html);
                 $container.append($newItem);
                 
-                // Pasamos 'i' para que sepa en qué orden vertical ir
                 applyChaosLogic($newItem, i);
 
-                // Calcular el punto más bajo para que el scroll sea correcto
                 const currentBottom = parseFloat($newItem.css('top')) + 400;
                 if (currentBottom > maxBottom) {
                     maxBottom = currentBottom;
                 }
             });
 
-            // Asignar el alto final al contenedor
             $container.css('height', (maxBottom + 400) + 'px');
         }
 
