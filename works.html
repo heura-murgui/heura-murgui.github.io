@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HM</title>
     <link rel="icon" href="assets/faviribbon.ico">
-    
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
@@ -23,9 +22,10 @@
 
         body.lock-scroll {
             overflow: hidden !important;
-            height: 100vh !important; 
+            height: 100vh !important;
         }
 
+        /* SISTEMA DE FILTROS */
         #filters {
             position: fixed;
             left: 20px;
@@ -43,12 +43,13 @@
             font-size: 11pt;
             cursor: pointer;
             color: black;
+            transition: all 0.2s;
         }
 
         #filters li:hover, #filters li.active {
             color: #ff0000;
-            text-shadow: 1px 1px 1px #ff0000, 1px -1px 1px #ff0000, -1px 1px 1px #ff0000, -1px -1px 1px #ff0000;
-        } 
+            text-shadow: 1px 1px 1px #ff0000;
+        }
 
         #info {
             position: fixed;
@@ -86,6 +87,8 @@
             font-family: inherit;
         }
 
+        #back-to-top:hover { color: white; }
+
         header {
             position: fixed;
             bottom: 20px;
@@ -121,7 +124,7 @@
         }
 
         #fullscreen-viewer {
-            display: none; 
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -129,183 +132,229 @@
             height: 100vh;
             background: white;
             z-index: 10000;
-            overflow-y: scroll; 
+            overflow-y: scroll;
             cursor: zoom-out;
         }
 
         #home { text-decoration: none; color: black; }
         #fullscreen-viewer img { width: 100%; height: auto; display: block; }
         .ui-draggable-dragging { cursor: grabbing !important; }
+
+        /* --- ESTILOS RESPONSIVE --- */
+        @media (max-width: 768px) {
+            #info {
+                font-size: 24pt;
+                top: 60px;
+                max-width: 85%;
+            }
+
+            .info-desc { font-size: 11pt; }
+
+            #filters {
+                top: auto;
+                bottom: 80px;
+                left: 20px;
+                transform: none;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                background: rgba(255, 255, 255, 0.9);
+                padding: 10px;
+                border: 1px solid #ddd;
+                width: calc(100% - 40px);
+            }
+
+            #filters li {
+                margin: 0;
+                background: #f0f0f0;
+                padding: 4px 8px;
+            }
+
+            .work-item {
+                width: 180px; /* Tamaño reducido para móviles */
+            }
+
+            header {
+                background: white;
+                width: 100%;
+                left: 0;
+                bottom: 0;
+                padding: 15px 20px;
+                border-top: 1px solid #000;
+                box-sizing: border-box;
+            }
+
+            header nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                font-size: 9pt;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="info"></div>
-    
-    <ul id="filters">
-        <li class="active" data-filter="all">#all</li>
-        <li data-filter="#35mm">#35mm</li>
-        <li data-filter="#editorial">#editorial</li>
-        <li data-filter="#fashion">#fashion</li>
-        <li data-filter="#product">#product</li>
-    </ul>
+<div id="info"></div>
 
-    <button id="back-to-top">↑ back to top</button>
+<ul id="filters">
+    <li class="active" data-filter="all">#all</li>
+    <li data-filter="#35mm">#35mm</li>
+    <li data-filter="#editorial">#editorial</li>
+    <li data-filter="#fashion">#fashion</li>
+    <li data-filter="#product">#product</li>
+</ul>
 
-    <div id="fullscreen-viewer"></div>
+<button id="back-to-top">↑ top</button>
 
-    <header>
-        <nav>
-            <li><a href="index.html" id="home">Heura Murgui</a></li>
-            <li><a href="works.html">works</a></li>
-            <li><a href="about.html">about</a></li>
-            <li><a href="mailto:heuramurgui@gmail.com">heuramurgui (at) gmail (dot) com</a></li>
-        </nav>
-    </header>
+<div id="fullscreen-viewer"></div>
 
-    <main>
-        <ul class="container-chaos" id="arena-container"></ul>
-    </main>
+<header>
+    <nav>
+        <li><a href="index.html" id="home">Heura Murgui</a></li>
+        <li><a href="works.html">works</a></li>
+        <li><a href="about.html">about</a></li>
+        <li><a href="mailto:heuramurgui@gmail.com">heuramurgui (at) gmail</a></li>
+    </nav>
+</header>
 
-    <script>
-    $(function() {
-        const CHANNEL_SLUG = 'angela-test'; 
-        const API_BASE = 'https://api.are.na/v2';
+<main>
+    <ul class="container-chaos" id="arena-container"></ul>
+</main>
 
-        $('#back-to-top').on('click', function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+<script>
+$(function() {
+    const CHANNEL_SLUG = 'angela-test';
+    const API_BASE = 'https://api.are.na/v2';
 
-        // Función de posicionamiento reutilizable
-        function positionElement(element, index) {
-            const $el = $(element);
-            const sign = Math.random() < 0.5 ? '-' : '+';
-            const posx = Math.random() * ($(window).width() - 350);
-            
-            // Posición vertical basada en el índice actual del filtro
-            const baseTop = index * 300; 
-            const randomVariation = Math.random() * 250; 
-            const posy = baseTop + randomVariation;
-            const rota = (Math.random() * 15).toFixed(2);
-
-            $el.css({
-                'left': posx + 'px',
-                'top': posy + 'px',
-                'transform': `rotate(${sign}${rota}deg)`,
-                'opacity': 1
-            });
-
-            return posy;
-        }
-
-        // Lógica de filtrado con reordenación arriba
-        $('#filters li').on('click', function() {
-            const filter = $(this).attr('data-filter');
-            $('#filters li').removeClass('active');
-            $(this).addClass('active');
-
-            let visibleCount = 0;
-            let maxBottom = 0;
-
-            $('.work-item').each(function() {
-                const $item = $(this);
-                const itemTags = $item.attr('data-tags') || "";
-
-                if (filter === 'all' || itemTags.includes(filter)) {
-                    $item.show();
-                    // Reposicionamos usando el contador de visibles actual
-                    const currentTop = positionElement($item, visibleCount);
-                    if (currentTop + 400 > maxBottom) maxBottom = currentTop + 400;
-                    visibleCount++;
-                } else {
-                    $item.hide();
-                }
-            });
-
-            $('#arena-container').css('height', (maxBottom + 400) + 'px');
-            window.scrollTo({ top: 0, behavior: 'instant' });
-        });
-
-        async function fetchArenaBlocks() {
-            try {
-                const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=50&direction=desc`);
-                const data = await response.json();
-                return data.contents.filter(block => block.class === 'Image');
-            } catch (error) {
-                console.error('Error:', error);
-                return [];
-            }
-        }
-
-        function applyInteractions($el) {
-            $el.draggable({ stack: ".work-item" });
-
-            $el.hover(
-                function() { 
-                    const title = $(this).attr('data-title');
-                    const date = $(this).attr('data-date');
-                    const desc = $(this).attr('data-description');
-                    let infoHtml = `<div>${title} <span style="font-weight:400; font-size:18pt;">(${date})</span></div>`;
-                    if (desc && desc !== "null") infoHtml += `<div class="info-desc">${desc}</div>`;
-                    $('#info').html(infoHtml);
-                    $(this).css('z-index', '9000');
-                }, 
-                function() { 
-                    $('#info').html('');
-                    $(this).css('z-index', '10');
-                }
-            );
-
-            $el.on('click', function() {
-                if ($(this).hasClass('ui-draggable-dragging')) return;
-                const imgSrc = $(this).find('img').attr('src');
-                $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).show();
-                $('body').addClass('lock-scroll');
-                $('#info, #filters, #back-to-top').hide();
-            });
-        }
-
-        $('#fullscreen-viewer').on('click', function() {
-            $(this).hide().empty();
-            $('body').removeClass('lock-scroll');
-            $('#info, #filters, #back-to-top').show();
-        });
-
-        async function init() {
-            const blocks = await fetchArenaBlocks();
-            const $container = $('#arena-container');
-            let maxBottom = 0;
-
-            blocks.forEach((block, i) => {
-                const imageUrl = block.image.display.url;
-                const title = block.title || "untitled";
-                const altText = block.image.alt || ""; // Leemos de Alt Text
-                const date = new Date(block.created_at).toLocaleDateString('en-EN', { year: 'numeric', month: 'numeric', day: 'numeric' });
-                const description = block.description || "";
-                
-                const html = `
-                    <li class="work-item" 
-                        data-title="${title}" 
-                        data-date="${date}" 
-                        data-description="${description}"
-                        data-tags="${altText}"> 
-                        <img class="thumb" src="${imageUrl}" alt="${title}" />
-                    </li>
-                `;
-                
-                const $newItem = $(html);
-                $container.append($newItem);
-                applyInteractions($newItem);
-                
-                const currentTop = positionElement($newItem, i);
-                if (currentTop + 400 > maxBottom) maxBottom = currentTop + 400;
-            });
-
-            $container.css('height', (maxBottom + 400) + 'px');
-        }
-
-        init();
+    // Botón volver arriba
+    $('#back-to-top').on('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    </script>
+
+    // Lógica de filtrado
+    $('#filters li').on('click', function() {
+        const filter = $(this).attr('data-filter');
+        $('#filters li').removeClass('active');
+        $(this).addClass('active');
+
+        if (filter === 'all') {
+            $('.work-item').fadeIn(400);
+        } else {
+            $('.work-item').each(function() {
+                const itemTags = $(this).attr('data-tags') || "";
+                if (itemTags.includes(filter)) {
+                    $(this).fadeIn(400);
+                } else {
+                    $(this).fadeOut(400);
+                }
+            });
+        }
+    });
+
+    // Lógica de posicionamiento adaptable
+    function applyChaosLogic(element, index) {
+        const $el = $(element);
+        const windowWidth = $(window).width();
+        const isMobile = windowWidth < 768;
+        
+        const sign = Math.random() < 0.5 ? '-' : '+';
+        
+        // Ajuste de límites para que no se salgan de la pantalla
+        const itemWidth = isMobile ? 180 : 320;
+        const posx = Math.random() * (windowWidth - itemWidth - 20);
+
+        // Ajuste vertical según dispositivo
+        const spacing = isMobile ? 130 : 150;
+        const variation = isMobile ? 50 : 80;
+        const posy = (index * spacing) + (Math.random() * variation);
+
+        const rota = (Math.random() * 12).toFixed(2);
+
+        $el.css({
+            'left': Math.max(10, posx) + 'px',
+            'top': posy + 'px',
+            'transform': `rotate(${sign}${rota}deg)`,
+            'opacity': 1
+        });
+
+        // Habilitar Draggable (con soporte touch gracias a Touch Punch)
+        $el.draggable({ stack: ".work-item" });
+
+        // Eventos de Info
+        $el.hover(
+            function() {
+                const title = $(this).attr('data-title');
+                const date = $(this).attr('data-date');
+                const desc = $(this).attr('data-description');
+                let infoHtml = `<div>${title} <span style="font-weight:400; font-size:0.4em;">(${date})</span></div>`;
+                if (desc && desc !== "null") infoHtml += `<div class="info-desc">${desc}</div>`;
+                $('#info').html(infoHtml);
+                $(this).css('z-index', '9000');
+            },
+            function() {
+                $('#info').html('');
+                $(this).css('z-index', '10');
+            }
+        );
+
+        // Click para Fullscreen
+        $el.on('click', function(e) {
+            if ($(this).hasClass('ui-draggable-dragging')) return;
+            const imgSrc = $(this).find('img').attr('src');
+            $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).show();
+            $('body').addClass('lock-scroll');
+            $('#info, #filters, #back-to-top').hide();
+        });
+    }
+
+    async function fetchArenaBlocks() {
+        try {
+            const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=50&direction=desc`);
+            const data = await response.json();
+            return data.contents.filter(block => block.class === 'Image');
+        } catch (error) {
+            console.error('Error:', error);
+            return [];
+        }
+    }
+
+    async function init() {
+        const blocks = await fetchArenaBlocks();
+        const $container = $('#arena-container');
+        let maxBottom = 0;
+
+        blocks.forEach((block, i) => {
+            const imageUrl = block.image.display.url;
+            const title = block.title || "untitled";
+            const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
+            const description = block.description || "";
+            
+            const html = `
+                <li class="work-item" data-title="${title}" data-date="${date}" data-description="${description}" data-tags="${description}">
+                    <img class="thumb" src="${imageUrl}" alt="${title}" />
+                </li>`;
+            
+            const $newItem = $(html);
+            $container.append($newItem);
+            applyChaosLogic($newItem, i);
+
+            const currentBottom = parseFloat($newItem.css('top')) + 400;
+            if (currentBottom > maxBottom) maxBottom = currentBottom;
+        });
+
+        $container.css('height', (maxBottom + 200) + 'px');
+    }
+
+    $('#fullscreen-viewer').on('click', function() {
+        $(this).hide().empty();
+        $('body').removeClass('lock-scroll');
+        $('#info, #filters, #back-to-top').show();
+    });
+
+    init();
+});
+</script>
+
 </body>
 </html>
