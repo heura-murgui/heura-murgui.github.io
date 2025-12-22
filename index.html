@@ -1,29 +1,165 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heura Murgui</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-<link rel="icon" href="assets/faviribbon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HM</title>
+     <link rel="icon" href="assets/faviribbon.ico">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt;
+            line-height: 1.2;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: right;
+        }
+  
+
+        header {
+            position: relative;
+            z-index: 10;
+            padding: 10px;
+        
+        }
+
+        nav li {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: rgb(255, 0, 0);
+        }
+
+        a:hover {
+            color: #ffffff;
+            background-color: rgb(110, 108, 108);
+        }
+
+        .list-clone {
+            position: absolute;
+            
+            opacity: 0.2; 
+            z-index: 1;
+            white-space: nowrap;
+            /* Centramos el clon respecto a su coordenada para que coincida con el original */
+            transform: translate(-50%, -50%); 
+        }
+    </style>
 </head>
 <body>
 
-    <div class="header-wrapper"> 
-        <h1>Heura Murgui ִֶָ☾.࣪ ִֶ </h1>
-        <nav class="links">
-            <a href="https://www.instagram.com/heuramurgui/" target="_blank" class="nav-link">Instagram</a>
-           
-            <a href="mailto:heuramurgui@gmail.com" class="nav-link">e.Mail</a>
-           
-            <a href="https://www.linkedin.com/in/heura-murgui-4a049a187/?originalSubdomain=es" target="_blank" class="nav-link">Linkedin</a>
-        </nav>
-         </div>
-    
-    <div id="shelf" class="bento-grid-container">
-        </div>
-    
-    <script src="from-arena.js"></script>
+    <header id="list">
+    
+        <nav>
+            <li style="color: black;">Heura Murgui</li>
+            <li><a href="works.html">works</a></li>
+            <li><a href="about.html">about</a></li>
+            <li><a href="mailto:heuramurgui@gmail.com">heuramurgui (at) gmail (dot) com</a></li>
+        </nav>
+    </header>
 
+    <script>
+        // --- CLASE BSPLINE ---
+        var BSpline = function(points, degree) {
+            this.points = points;
+            this.degree = degree;
+            this.dimension = points[0].length;
+            this.baseFunc = this.basisDeg3;
+            this.baseFuncRangeInt = 2;
+        };
+
+        BSpline.prototype.seqAt = function(dim) {
+            var points = this.points;
+            var margin = this.degree + 1;
+            return function(n) {
+                if (n < margin) return points[0][dim];
+                if (points.length + margin <= n) return points[points.length - 1][dim];
+                return points[n - margin][dim];
+            };
+        };
+
+        BSpline.prototype.basisDeg3 = function(x) {
+            if (-1 <= x && x < 0) return 2.0/3.0 + (-1.0 - x/2.0)*x*x;
+            if (1 <= x && x <= 2) return 4.0/3.0 + x*(-2.0 + (1.0 - x/6.0)*x);
+            if (-2 <= x && x < -1) return 4.0/3.0 + x*(2.0 + (1.0 + x/6.0)*x);
+            if (0 <= x && x < 1) return 2.0/3.0 + (-1.0 + x/2.0)*x*x;
+            return 0;
+        };
+
+        BSpline.prototype.getInterpol = function(seq, t) {
+            var f = this.baseFunc;
+            var rangeInt = this.baseFuncRangeInt;
+            var tInt = Math.floor(t);
+            var result = 0;
+            for (var i = tInt - rangeInt; i <= tInt + rangeInt; i++) {
+                result += seq(i) * f(t - i);
+            }
+            return result;
+        };
+
+        BSpline.prototype.calcAt = function(t) {
+            t = t * ((this.degree + 1) * 2 + this.points.length);
+            var res = [];
+            for (var i = 0; i < this.dimension; i++) {
+                res.push(this.getInterpol(this.seqAt(i), t));
+            }
+            return res;
+        };
+
+       
+        let w = window.innerWidth;
+        let h = window.innerHeight;
+        let list = document.getElementById('list');
+
+        const drawClone = (p) => {
+            let listClone = list.cloneNode(true);
+            listClone.removeAttribute('id');
+            listClone.classList.add('list-clone');
+            listClone.style.top = p[0] + 'px';
+            listClone.style.left = p[1] + 'px';
+            document.body.appendChild(listClone);
+        };
+
+        // 1. Calculamos el centro exacto de la pantalla
+        const centroY = h / 2;
+        const centroX = w / 2;
+
+        // 2. Generamos puntos, pero el PRIMERO es siempre el centro
+        let points = [];
+        points.push([centroY, centroX]); // Punto inicial: centro
+
+        // Añadimos el resto de puntos aleatorios
+        for(let i = 0; i < 4; i++) {
+            points.push([
+                Math.random() * (h - 100) + 50, 
+                Math.random() * (w - 200) + 100
+            ]);
+        }
+
+        let spline = new BSpline(points, 3);
+        let t = 0.15;
+
+        let interval = setInterval(() => {
+            var p = spline.calcAt(t);
+            drawClone(p);
+            t += 0.004; // Un poco más lento para apreciar el inicio
+            if (t >= 1) clearInterval(interval);
+        }, 25);
+    </script>
 </body>
 </html>
