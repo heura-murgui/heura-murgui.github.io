@@ -148,8 +148,8 @@
     }
 
     .main-container {
-        align-items: center; /* Centramos el texto para mejor lectura en móvil */
-        text-align: center;
+        align-items: left; /* Centramos el texto para mejor lectura en móvil */
+        text-align: right;
         max-width: 100%;
         margin-top: 450px; /* Dejamos espacio para la ventana que flota arriba */
     }
@@ -167,7 +167,7 @@
     }
 
     nav li {
-        margin-bottom: 10px;
+        margin-bottom: 0px;
     }
 
     a {
@@ -175,21 +175,7 @@
     }
 }
 
-/* Para móviles muy pequeños (menos de 480px) */
-@media (max-width: 480px) {
-    .window-wrapper {
-        top: 180px;
-        transform: translate(-50%, -50%) scale(0.7); /* Más pequeña aún */
-    }
-    
-    .main-container {
-        margin-top: 350px;
-    }
 
-    .title-text {
-        font-size: 9pt;
-    }
-}
     </style>
 </head>
 <body>
