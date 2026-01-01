@@ -12,13 +12,13 @@
             margin: 0;
             padding: 0;
             text-transform: uppercase;
-            overflow-x: hidden; /* Evita scroll horizontal por las ventanas */
+            overflow-x: hidden;
         }
 
         body {
             font-family: "Times New Roman", Times, serif;
             font-size: 11pt;
-            line-height: 1.2;
+            line-height: 1.1;
             color: #1a1a1a;
             background-color: #f4f4f4;
             display: flex;
@@ -35,7 +35,7 @@
             align-items: flex-end;
             text-align: right;
             max-width: 450px;
-            z-index: 5; /* Asegura que el texto esté accesible */
+            z-index: 5;
         }
 
         nav { margin-bottom: 20px; }
@@ -63,16 +63,15 @@
 
         /* VENTANA ESTILO WINDOWS 98 */
         .window-wrapper {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 40%;
             transform: translate(-50%, -50%);
-            z-index: 10; /* Z-INDEX POSITIVO PARA QUE SEA CLICABLE */
+            z-index: 10;
         }
 
         .win98-window {
             background-color: #c0c0c0;
-            border: 0px solid #000;
             box-shadow: inset 1px 1px #dfdfdf, 1px 1px #000;
             padding: 2px;
             width: fit-content;
@@ -99,13 +98,24 @@
             gap: 2px;
         }
 
+        /* AJUSTE ESPECÍFICO PARA BOTONES (SAFARI MÓVIL) */
         .win98-btn {
             width: 52px;
             height: 50px;
             background-color: #c0c0c0;
             border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
+            
+            /* Forzar estilos visuales */
+            font-family: "Times New Roman", Times, serif !important;
+            color: #000000 !important;
             font-size: 48pt;
+            
+            /* Reset nativo de Safari/iOS */
+            -webkit-appearance: none;
+            appearance: none;
+            border-radius: 0;
+            
             display: flex;
             align-items: center;
             justify-content: center;
@@ -120,7 +130,6 @@
         }
 
         .win98-content {
-            border: 0px solid #808080;
             background-color: #fff;
             margin: 1px;
             width: 300px;  
@@ -136,46 +145,35 @@
         }
 
         /* --- AJUSTES RESPONSIVE --- */
+        @media (max-width: 768px) {
+            body {
+                justify-content: center;
+                align-items: flex-start;
+                padding: 20px;
+                height: auto;
+                overflow-y: auto;
+            }
 
-/* Para tablets y móviles (menos de 768px) */
-@media (max-width: 768px) {
-    body {
-        justify-content: center; /* Centramos el contenido en móviles */
-        align-items: flex-start;
-        padding: 20px;
-        height: auto; /* Permitimos que el body crezca si hay mucho texto */
-        overflow-y: auto;
-    }
+            .main-container {
+                align-items: flex-end; /* Mantenemos derecha según el estilo original */
+                text-align: right;
+                max-width: 100%;
+                margin-top: 450px; 
+            }
 
-    .main-container {
-        align-items: left; /* Centramos el texto para mejor lectura en móvil */
-        text-align: right;
-        max-width: 100%;
-        margin-top: 450px; /* Dejamos espacio para la ventana que flota arriba */
-    }
+            .window-wrapper {
+                left: 50%;
+                top: 220px;
+                transform: translate(-50%, -50%) scale(0.85);
+            }
 
-    /* Ajustamos la ventana para que no sea gigante en móviles */
-    .window-wrapper {
-        left: 50%;
-        top: 220px; /* La posicionamos arriba */
-        transform: translate(-50%, -50%) scale(0.85); /* La escalamos un poco */
-    }
+            .win98-content {
+                width: 80vw;
+                height: 300px;
+            }
 
-    .win98-content {
-        width: 80vw; /* Ancho basado en la pantalla del móvil */
-        height: 300px;
-    }
-
-    nav li {
-        margin-bottom: 0px;
-    }
-
-    a {
-        white-space: normal; /* Permitimos que los links largos rompan línea si es necesario */
-    }
-}
-
-
+            a { white-space: normal; }
+        }
     </style>
 </head>
 <body>
@@ -186,8 +184,8 @@
                 <div class="title-text">IMG_4150.jpg</div>
                 <div class="title-controls">
                     <button class="win98-btn">-</button>
-                    <button class="win98-btn">□</button>
-                    <button class="win98-btn btn-close">x</button>
+                    <button class="win98-btn">☐</button>
+                    <button class="win98-btn btn-close">✕</button>
                 </div>
             </div>
             <div class="win98-content">
@@ -236,37 +234,45 @@
     const originalWindow = document.getElementById('master-window');
     
     let count = 0;
-    let offset = 0;
     let isCloning = false;
 
     closeBtn.addEventListener('click', () => {
-        if (isCloning) return; // Evita múltiples clics simultáneos
+        if (isCloning) return; 
         isCloning = true;
 
+        // Número total de ventanas que se crearán
+        const totalClones = 80; 
+
         const interval = setInterval(() => {
-            if (count > 40) { // Límite de seguridad
+            if (count >= totalClones) {
                 clearInterval(interval);
                 return;
             }
 
-            // Clonar la ventana
             const clone = originalWindow.cloneNode(true);
             
-            // Ajustar posición
-            offset += 20;
-            count++;
+            // Posiciones aleatorias por toda la pantalla (de 0 a 85% para que no se salgan)
+            const randomTop = Math.random() * 85; 
+            const randomLeft = Math.random() * 85;
             
-            clone.style.top = `calc(50% + ${offset}px)`;
-            clone.style.left = `calc(40% + ${offset}px)`;
-            clone.style.zIndex = 10 + count;
+            // Aplicamos estilos de posición fija para que se superpongan a todo
+            clone.style.position = 'fixed';
+            clone.style.top = randomTop + '%';
+            clone.style.left = randomLeft + '%';
+            clone.style.transform = 'translate(0, 0)'; 
+            clone.style.zIndex = 100 + count;
             
-            // Deshabilitar botón en los clones para evitar bucles
-            const cloneBtn = clone.querySelector('.btn-close');
-            cloneBtn.style.cursor = 'default';
-            cloneBtn.onclick = (e) => e.preventDefault();
+            // Deshabilitar el botón en los clones
+            const cloneCloseBtn = clone.querySelector('.btn-close');
+            cloneCloseBtn.style.cursor = 'default';
+            cloneCloseBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            };
 
             document.body.appendChild(clone);
-        }, 80);
+            count++;
+        }, 40); // Velocidad de aparición (40ms es muy rápido)
     });
 </script>
 
