@@ -188,11 +188,12 @@ $(function() {
     const CHANNEL_SLUG = 'angela-test';
     const API_BASE = 'https://api.are.na/v2';
 
+    // Botón volver arriba
     $('#back-to-top').on('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Lógica de filtrado mejorada
+    // Lógica de filtrado
     $('#filters li').on('click', function() {
         const filter = $(this).attr('data-filter').toLowerCase();
         $('#filters li').removeClass('active');
@@ -202,9 +203,7 @@ $(function() {
             $('.work-item').fadeIn(400);
         } else {
             $('.work-item').each(function() {
-                // Buscamos en el atributo de búsqueda que combina todo
                 const searchContent = ($(this).attr('data-search') || "").toLowerCase();
-                
                 if (searchContent.includes(filter)) {
                     $(this).fadeIn(400);
                 } else {
@@ -262,7 +261,8 @@ $(function() {
 
     async function fetchArenaBlocks() {
         try {
-            const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=100&direction=desc`);
+            const timestamp = new Date().getTime();
+            const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=100&direction=desc&nocache=${timestamp}`);
             const data = await response.json();
             return data.contents.filter(block => block.class === 'Image');
         } catch (error) {
@@ -282,12 +282,12 @@ $(function() {
             const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
             const description = block.description || "";
             
-            // INTENTO DE CAPTURA MULTIPLE: Are.na puede guardar el "Alt text" en diferentes sitios según la versión
-            const altText = block.alt_text || "";
-            const metadataAlt = (block.metadata && block.metadata.alt) ? block.metadata.alt : "";
+            // INTENTO AGRESIVO DE CAPTURA DE ALT TEXT
+            // Probamos: campo directo, campo dentro de imagen o metadata
+            const altText = block.alt_text || (block.image && block.image.alt_text) || "";
             
-            // Creamos un súper campo de búsqueda que combine todo lo posible
-            const megaSearch = `${title} ${description} ${altText} ${metadataAlt}`.toLowerCase();
+            // Creamos el campo de búsqueda sumando todo
+            const megaSearch = `${title} ${description} ${altText}`.toLowerCase();
             
             const html = `
                 <li class="work-item" 
@@ -295,7 +295,7 @@ $(function() {
                     data-date="${date}" 
                     data-description="${description}" 
                     data-search="${megaSearch}">
-                    <img class="thumb" src="${imageUrl}" alt="${title}" />
+                    <img class="thumb" src="${imageUrl}" alt="${altText || title}" />
                 </li>`;
             
             const $newItem = $(html);
