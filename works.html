@@ -45,7 +45,6 @@
             font-size: 11pt;
             cursor: pointer;
             color: black;
-         
         }
 
         #filters li:hover, #filters li.active {
@@ -142,16 +141,13 @@
         #fullscreen-viewer img { width: 100%; height: auto; display: block; }
         .ui-draggable-dragging { cursor: grabbing !important; }
 
-        /* --- ESTILOS RESPONSIVE --- */
         @media (max-width: 768px) {
             #info {
                 font-size: 24pt;
                 top: 60px;
                 max-width: 85%;
             }
-
             .info-desc { font-size: 11pt; }
-
             #filters {
                 top: auto;
                 bottom: 80px;
@@ -161,18 +157,15 @@
                 flex-wrap: wrap;
                 gap: 0px;
                 padding: 1px;
-                                width: calc(100% - 40px);
+                width: calc(100% - 40px);
             }
-
             #filters li {
                 margin: 0;
                 padding: 0px 4px;
             }
-
             .work-item {
-                width: 180px; /* Tamaño reducido para móviles */
+                width: 180px;
             }
-
             header {
                 width: 80%;
                 left: 0;
@@ -180,7 +173,6 @@
                 padding: 5px 25px;
                 box-sizing: border-box;
             }
-
             header nav {
                 display: flex;
                 flex-direction: column;
@@ -229,9 +221,9 @@ $(function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Lógica de filtrado
+    // Lógica de filtrado (Busca en el campo Alt Text)
     $('#filters li').on('click', function() {
-        const filter = $(this).attr('data-filter');
+        const filter = $(this).attr('data-filter').toLowerCase();
         $('#filters li').removeClass('active');
         $(this).addClass('active');
 
@@ -239,8 +231,9 @@ $(function() {
             $('.work-item').fadeIn(400);
         } else {
             $('.work-item').each(function() {
-                const itemTags = $(this).attr('data-tags') || "";
-                if (itemTags.includes(filter)) {
+                const itemAlt = ($(this).attr('data-alt') || "").toLowerCase();
+                // Comprobamos si el tag del filtro está incluido en el Alt Text
+                if (itemAlt.includes(filter)) {
                     $(this).fadeIn(400);
                 } else {
                     $(this).fadeOut(400);
@@ -249,23 +242,16 @@ $(function() {
         }
     });
 
-    // Lógica de posicionamiento adaptable
     function applyChaosLogic(element, index) {
         const $el = $(element);
         const windowWidth = $(window).width();
         const isMobile = windowWidth < 768;
-        
         const sign = Math.random() < 0.5 ? '-' : '+';
-        
-        // Ajuste de límites para que no se salgan de la pantalla
         const itemWidth = isMobile ? 180 : 320;
         const posx = Math.random() * (windowWidth - itemWidth - 20);
-
-        // Ajuste vertical según dispositivo
         const spacing = isMobile ? 130 : 150;
         const variation = isMobile ? 50 : 80;
         const posy = (index * spacing) + (Math.random() * variation);
-
         const rota = (Math.random() * 12).toFixed(2);
 
         $el.css({
@@ -275,17 +261,15 @@ $(function() {
             'opacity': 1
         });
 
-        // Habilitar Draggable (con soporte touch gracias a Touch Punch)
         $el.draggable({ stack: ".work-item" });
 
-        // Eventos de Info
         $el.hover(
             function() {
                 const title = $(this).attr('data-title');
                 const date = $(this).attr('data-date');
                 const desc = $(this).attr('data-description');
                 let infoHtml = `<div>${title} <span style="font-weight:400; font-size:0.4em;">(${date})</span></div>`;
-                if (desc && desc !== "null") infoHtml += `<div class="info-desc">${desc}</div>`;
+                if (desc && desc !== "null" && desc !== "") infoHtml += `<div class="info-desc">${desc}</div>`;
                 $('#info').html(infoHtml);
                 $(this).css('z-index', '9000');
             },
@@ -295,7 +279,6 @@ $(function() {
             }
         );
 
-        // Click para Fullscreen
         $el.on('click', function(e) {
             if ($(this).hasClass('ui-draggable-dragging')) return;
             const imgSrc = $(this).find('img').attr('src');
@@ -307,7 +290,7 @@ $(function() {
 
     async function fetchArenaBlocks() {
         try {
-            const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=50&direction=desc`);
+            const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=100&direction=desc`);
             const data = await response.json();
             return data.contents.filter(block => block.class === 'Image');
         } catch (error) {
@@ -326,9 +309,15 @@ $(function() {
             const title = block.title || "untitled";
             const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
             const description = block.description || "";
+            // Capturamos el contenido del recuadro "Alt text" de Are.na
+            const altText = block.alt_text || "";
             
             const html = `
-                <li class="work-item" data-title="${title}" data-date="${date}" data-description="${description}" data-tags="${description}">
+                <li class="work-item" 
+                    data-title="${title}" 
+                    data-date="${date}" 
+                    data-description="${description}" 
+                    data-alt="${altText}">
                     <img class="thumb" src="${imageUrl}" alt="${title}" />
                 </li>`;
             
