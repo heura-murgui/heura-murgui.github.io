@@ -142,43 +142,16 @@
         .ui-draggable-dragging { cursor: grabbing !important; }
 
         @media (max-width: 768px) {
-            #info {
-                font-size: 24pt;
-                top: 60px;
-                max-width: 85%;
-            }
+            #info { font-size: 24pt; top: 60px; max-width: 85%; }
             .info-desc { font-size: 11pt; }
             #filters {
-                top: auto;
-                bottom: 80px;
-                left: 20px;
-                transform: none;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0px;
-                padding: 1px;
+                top: auto; bottom: 80px; left: 20px;
+                transform: none; display: flex; flex-wrap: wrap;
                 width: calc(100% - 40px);
             }
-            #filters li {
-                margin: 0;
-                padding: 0px 4px;
-            }
-            .work-item {
-                width: 180px;
-            }
-            header {
-                width: 80%;
-                left: 0;
-                bottom: 0;
-                padding: 5px 25px;
-                box-sizing: border-box;
-            }
-            header nav {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                font-size: 11pt;
-            }
+            #filters li { padding: 0px 4px; }
+            .work-item { width: 180px; }
+            header { width: 80%; left: 0; bottom: 0; padding: 5px 25px; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -195,7 +168,6 @@
 </ul>
 
 <button id="back-to-top">↑ back to top</button>
-
 <div id="fullscreen-viewer"></div>
 
 <header>
@@ -216,12 +188,11 @@ $(function() {
     const CHANNEL_SLUG = 'angela-test';
     const API_BASE = 'https://api.are.na/v2';
 
-    // Botón volver arriba
     $('#back-to-top').on('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Lógica de filtrado (Busca en el campo Alt Text)
+    // Lógica de filtrado mejorada
     $('#filters li').on('click', function() {
         const filter = $(this).attr('data-filter').toLowerCase();
         $('#filters li').removeClass('active');
@@ -231,9 +202,10 @@ $(function() {
             $('.work-item').fadeIn(400);
         } else {
             $('.work-item').each(function() {
-                const itemAlt = ($(this).attr('data-alt') || "").toLowerCase();
-                // Comprobamos si el tag del filtro está incluido en el Alt Text
-                if (itemAlt.includes(filter)) {
+                // Buscamos en el atributo de búsqueda que combina todo
+                const searchContent = ($(this).attr('data-search') || "").toLowerCase();
+                
+                if (searchContent.includes(filter)) {
                     $(this).fadeIn(400);
                 } else {
                     $(this).fadeOut(400);
@@ -294,7 +266,7 @@ $(function() {
             const data = await response.json();
             return data.contents.filter(block => block.class === 'Image');
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error Are.na:', error);
             return [];
         }
     }
@@ -306,18 +278,23 @@ $(function() {
 
         blocks.forEach((block, i) => {
             const imageUrl = block.image.display.url;
-            const title = block.title || "untitled";
+            const title = block.title || "";
             const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
             const description = block.description || "";
-            // Capturamos el contenido del recuadro "Alt text" de Are.na
+            
+            // INTENTO DE CAPTURA MULTIPLE: Are.na puede guardar el "Alt text" en diferentes sitios según la versión
             const altText = block.alt_text || "";
+            const metadataAlt = (block.metadata && block.metadata.alt) ? block.metadata.alt : "";
+            
+            // Creamos un súper campo de búsqueda que combine todo lo posible
+            const megaSearch = `${title} ${description} ${altText} ${metadataAlt}`.toLowerCase();
             
             const html = `
                 <li class="work-item" 
                     data-title="${title}" 
                     data-date="${date}" 
                     data-description="${description}" 
-                    data-alt="${altText}">
+                    data-search="${megaSearch}">
                     <img class="thumb" src="${imageUrl}" alt="${title}" />
                 </li>`;
             
