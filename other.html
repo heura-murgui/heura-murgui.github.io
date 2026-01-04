@@ -142,6 +142,15 @@
         #fullscreen-viewer img { width: 100%; height: auto; display: block; }
         .ui-draggable-dragging { cursor: grabbing !important; }
 
+        #ivy-canvas {
+    position: absolute; /* Para que crezca con el scroll del contenedor */
+    top: 0;
+    left: 0;
+    z-index: -1; /* Detrás de los videos y el menú */
+    pointer-events: none; /* Para que no bloquee los clics en los videos */
+    image-rendering: pixelated; /* Estética Sandspiel/Pixel Art */
+}
+
         @media (max-width: 768px) {
             #info { font-size: 24pt; top: 60px; max-width: 85%; }
             .info-desc { font-size: 11pt; }
@@ -158,17 +167,10 @@
 </head>
 <body>
 
+<canvas id="ivy-canvas"></canvas>
+    
 <div id="info"></div>
 
-<ul id="filters">
-    <li class="active" data-filter="all">#all</li>
-    <li data-filter="#35mm">#35mm</li>
-    <li data-filter="#editorial">#editorial</li>
-    <li data-filter="#fashion">#fashion</li>
-    <li data-filter="#product">#product</li>
-</ul>
-
-<button id="back-to-top">↑ back to top</button>
 <div id="fullscreen-viewer"></div>
 
 <header>
@@ -186,7 +188,7 @@
 
 <script>
 $(function() {
-    const CHANNEL_SLUG = 'angela-test';
+    const CHANNEL_SLUG = 'a';
     const API_BASE = 'https://api.are.na/v2';
 
     // Botón volver arriba
@@ -317,6 +319,72 @@ $(function() {
     });
 
     init();
+});
+
+
+const canvas = document.getElementById('ivy-canvas');
+const ctx = canvas.getContext('2d');
+
+let walkers = [];
+
+function initCanvas() {
+    // Ajustamos el canvas al tamaño total del documento, no solo de la ventana
+    canvas.width = window.innerWidth;
+    canvas.height = document.documentElement.scrollHeight;
+}
+
+class IvyWalker {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = 2; // Tamaño del "píxel"
+        this.life = 0;
+        this.angle = Math.random() * Math.PI * 2;
+    }
+
+    update() {
+        // Movimiento orgánico: ruidoso pero con tendencia hacia alguna dirección
+        this.angle += (Math.random() - 0.5) * 0.5;
+        this.x += Math.cos(this.angle) * 2;
+        this.y += Math.sin(this.angle) * 2 - 0.2; // Tendencia ligera a subir
+
+        this.life++;
+
+        // Dibujar el rastro
+        ctx.fillStyle = this.color;
+        ctx.fillRect(Math.floor(this.x), Math.floor(this.y), this.size, this.size);
+
+        // Ramificación aleatoria (como en Sandspiel)
+        if (Math.random() < 0.02 && walkers.length < 100) {
+            walkers.push(new IvyWalker(this.x, this.y, this.color));
+        }
+    }
+}
+
+function startIvy() {
+    initCanvas();
+    // Creamos puntos de inicio en la base de la página
+    for(let i = 0; i < 5; i++){
+        walkers.push(new IvyWalker(Math.random() * canvas.width, canvas.height - 10, '#2d5a27'));
+    }
+    animate();
+}
+
+function animate() {
+    walkers.forEach((walker, index) => {
+        walker.update();
+        // Eliminar si sale de los límites o vive demasiado
+        if (walker.x < 0 || walker.x > canvas.width || walker.y < 0 || walker.life > 500) {
+            walkers.splice(index, 1);
+        }
+    });
+    requestAnimationFrame(animate);
+}
+
+// Iniciar cuando la página esté lista
+$(window).on('load', function() {
+    setTimeout(startIvy, 2000); // Aparece como easter egg tras 2 segundos
 });
 </script>
 
