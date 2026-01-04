@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pixel Art Garden - Tall & Slow</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f4f4f4; /* Color de fondo rosado */
+        }
+        #pixelCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            image-rendering: pixelated; /* Mantiene la estética bit art */
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="pixelCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const pixelSize = 4;
+        const colors = {
+            stem: '#4a6d55',
+            flowers: ['#9cd888', '#9cd888', '#9cd888', '#9cd888'],
+        };
+
+        let plants = [];
+
+        class Stem {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                // Aumentamos la altura máxima: entre 60% y 95% de la altura de la pantalla
+                this.maxHeight = canvas.height * (0.6 + Math.random() * 0.35);
+                this.currentHeight = 0;
+                this.dead = false;
+                
+                // Retardo de nacimiento: hasta 10 segundos de espera para algunas
+                this.spawnTime = Date.now() + Math.random() * 10000; 
+                // Probabilidad de crecimiento muy baja para que sea lento y "a trompicones"
+                this.growthChance = 0.05 + Math.random() * 0.3; 
+            }
+
+            update(now) {
+                if (now < this.spawnTime || this.dead) return;
+
+                if (Math.random() < this.growthChance) {
+                    this.drawPixel(this.x, this.y, colors.stem);
+
+                    // Movimiento vertical
+                    this.y -= pixelSize;
+                    // Movimiento horizontal con más "serpenteo" para tallos largos
+                    this.x += (Math.random() - 0.5) * (pixelSize * 2.5);
+                    this.currentHeight += pixelSize;
+
+                    // Pequeñas flores laterales ocasionales
+                    if (Math.random() > 0.97) {
+                        this.drawFlower(false);
+                    }
+
+                    // Condición de parada al alcanzar la altura máxima
+                    if (this.currentHeight >= this.maxHeight) {
+                        this.dead = true;
+                        this.drawFlower(true); // Flor final en la punta
+                    }
+                }
+            }
+
+            drawPixel(x, y, color) {
+                ctx.fillStyle = color;
+                ctx.fillRect(
+                    Math.floor(x / pixelSize) * pixelSize,
+                    Math.floor(y / pixelSize) * pixelSize,
+                    pixelSize,
+                    pixelSize
+                );
+            }
+
+            drawFlower(isFinal) {
+                const color = colors.flowers[Math.floor(Math.random() * colors.flowers.length)];
+                // Estructura de flor en cruz
+                this.drawPixel(this.x + pixelSize, this.y, color);
+                this.drawPixel(this.x - pixelSize, this.y, color);
+                this.drawPixel(this.x, this.y - pixelSize, color);
+                
+                if(isFinal) {
+                    // Pétalos extra para la flor de la punta
+                    this.drawPixel(this.x + pixelSize, this.y - pixelSize, color);
+                    this.drawPixel(this.x - pixelSize, this.y - pixelSize, color);
+                    this.drawPixel(this.x, this.y - (pixelSize * 2), color);
+                }
+            }
+        }
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            plants = [];
+
+            // Crear 40 plantas repartidas por la base
+            for (let i = 0; i < 40; i++) {
+                // Las posicionamos justo en el borde inferior
+                plants.push(new Stem(Math.random() * canvas.width, canvas.height));
+            }
+
+            animate();
+        }
+
+        function animate() {
+            const now = Date.now();
+            let livingPlants = false;
+
+            plants.forEach(p => {
+                if (!p.dead) {
+                    p.update(now);
+                    livingPlants = true;
+                }
+            });
+
+            // Delay de 100ms para un dibujo muy pausado y relajante
+            setTimeout(() => {
+                requestAnimationFrame(animate);
+            }, 100); 
+        }
+
+        // Reiniciar al cambiar el tamaño de ventana para ajustar alturas
+        window.addEventListener('resize', init);
+
+        init();
+    </script>
+</body>
+</html>

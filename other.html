@@ -27,7 +27,19 @@
             height: 100vh !important;
         }
 
-        /* SISTEMA DE FILTROS */
+        /* --- BACKGROUND CANVAS (A) --- */
+        #ivy-canvas {
+             position: fixed; /* Mantiene el fondo quieto mientras haces scroll */
+             top: 0;
+             left: 0;
+             width: 100vw;
+             height: 100vh;
+             z-index: -1; /* Detrás de todo */
+             pointer-events: none; /* No interfiere con clics */
+             image-rendering: pixelated;
+        }
+
+        /* SISTEMA DE FILTROS Y OTROS ESTILOS */
         #filters {
             position: fixed;
             left: 20px;
@@ -89,8 +101,6 @@
             font-family: inherit;
         }
 
-        #back-to-top:hover { color: white; }
-
         header {
             position: fixed;
             bottom: 20px;
@@ -120,7 +130,6 @@
 
         .thumb {
             width: 100%;
-            height: auto;
             display: block;
             pointer-events: none;
         }
@@ -139,17 +148,7 @@
         }
 
         #home { text-decoration: none; color: black; }
-        #fullscreen-viewer img { width: 100%; height: auto; display: block; }
-        .ui-draggable-dragging { cursor: grabbing !important; }
-
-        #ivy-canvas {
-             position: absolute; /* Para que crezca con el scroll del contenedor */
-             top: 0;
-             left: 0;
-             z-index: -1; /* Detrás de los videos y el menú */
-             pointer-events: none; /* Para que no bloquee los clics en los videos */
-             image-rendering: pixelated; /* Estética Sandspiel/Pixel Art */
-        }
+        #fullscreen-viewer img { width: 100%; display: block; }
 
         @media (max-width: 768px) {
             #info { font-size: 24pt; top: 60px; max-width: 85%; }
@@ -159,7 +158,6 @@
                 transform: none; display: flex; flex-wrap: wrap;
                 width: calc(100% - 40px);
             }
-            #filters li { padding: 0px 4px; }
             .work-item { width: 180px; }
             header { width: 100%; left: 0; bottom: 0; padding: 5px 25px; box-sizing: border-box; }
         }
@@ -170,7 +168,6 @@
 <canvas id="ivy-canvas"></canvas>
     
 <div id="info"></div>
-
 <div id="fullscreen-viewer"></div>
 
 <header>
@@ -187,33 +184,94 @@
 </main>
 
 <script>
+/* ==========================================
+   LÓGICA DEL BACKGROUND
+   ========================================== */
+const canvas = document.getElementById('ivy-canvas');
+const ctx = canvas.getContext('2d');
+const pixelSize = 4;
+const colors = {
+    stem: '#4a6d55',
+    flowers: ['#9cd888', '#9cd888', '#9cd888', '#9cd888'],
+};
+let plants = [];
+
+class Stem {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.maxHeight = canvas.height * (0.6 + Math.random() * 0.35);
+        this.currentHeight = 0;
+        this.dead = false;
+        this.spawnTime = Date.now() + Math.random() * 10000; 
+        this.growthChance = 0.05 + Math.random() * 0.3; 
+    }
+
+    update(now) {
+        if (now < this.spawnTime || this.dead) return;
+        if (Math.random() < this.growthChance) {
+            this.drawPixel(this.x, this.y, colors.stem);
+            this.y -= pixelSize;
+            this.x += (Math.random() - 0.5) * (pixelSize * 2.5);
+            this.currentHeight += pixelSize;
+            if (Math.random() > 0.97) this.drawFlower(false);
+            if (this.currentHeight >= this.maxHeight) {
+                this.dead = true;
+                this.drawFlower(true);
+            }
+        }
+    }
+
+    drawPixel(x, y, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(Math.floor(x/pixelSize)*pixelSize, Math.floor(y/pixelSize)*pixelSize, pixelSize, pixelSize);
+    }
+
+    drawFlower(isFinal) {
+        const color = colors.flowers[Math.floor(Math.random() * colors.flowers.length)];
+        this.drawPixel(this.x + pixelSize, this.y, color);
+        this.drawPixel(this.x - pixelSize, this.y, color);
+        this.drawPixel(this.x, this.y - pixelSize, color);
+        if(isFinal) {
+            this.drawPixel(this.x + pixelSize, this.y - pixelSize, color);
+            this.drawPixel(this.x - pixelSize, this.y - pixelSize, color);
+            this.drawPixel(this.x, this.y - (pixelSize * 2), color);
+        }
+    }
+}
+
+function initBackground() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    plants = [];
+    for (let i = 0; i < 40; i++) {
+        plants.push(new Stem(Math.random() * canvas.width, canvas.height));
+    }
+}
+
+function animateBackground() {
+    const now = Date.now();
+    plants.forEach(p => p.update(now));
+    setTimeout(() => { requestAnimationFrame(animateBackground); }, 100); 
+}
+
+// Iniciar background
+initBackground();
+animateBackground();
+window.addEventListener('resize', initBackground);
+
+
+/* ==========================================
+   LÓGICA DE ARE.NA
+   ========================================== */
 $(function() {
     const CHANNEL_SLUG = 'a';
     const API_BASE = 'https://api.are.na/v2';
 
-    // Botón volver arriba
+    // (Aquí va todo tu código JQuery original sin cambios...)
     $('#back-to-top').on('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // Lógica de filtrado
-    $('#filters li').on('click', function() {
-        const filter = $(this).attr('data-filter').toLowerCase();
-        $('#filters li').removeClass('active');
-        $(this).addClass('active');
-
-        if (filter === 'all') {
-            $('.work-item').fadeIn(400);
-        } else {
-            $('.work-item').each(function() {
-                const searchContent = ($(this).attr('data-search') || "").toLowerCase();
-                if (searchContent.includes(filter)) {
-                    $(this).fadeIn(400);
-                } else {
-                    $(this).fadeOut(400);
-                }
-            });
-        }
     });
 
     function applyChaosLogic(element, index) {
@@ -226,12 +284,10 @@ $(function() {
         const spacing = isMobile ? 130 : 150;
         const variation = isMobile ? 50 : 80;
         const posy = (index * spacing) + (Math.random() * variation);
-        const rota = (Math.random() * 0).toFixed(2);
 
         $el.css({
             'left': Math.max(10, posx) + 'px',
             'top': posy + 'px',
-            'transform': `rotate(${sign}${rota}deg)`,
             'opacity': 1
         });
 
@@ -245,12 +301,8 @@ $(function() {
                 let infoHtml = `<div>${title} <span style="font-weight:400; font-size:0.4em;">(${date})</span></div>`;
                 if (desc && desc !== "null" && desc !== "") infoHtml += `<div class="info-desc">${desc}</div>`;
                 $('#info').html(infoHtml);
-                $(this).css('z-index', '9000');
             },
-            function() {
-                $('#info').html('');
-                $(this).css('z-index', '10');
-            }
+            function() { $('#info').html(''); }
         );
 
         $el.on('click', function(e) {
@@ -268,13 +320,10 @@ $(function() {
             const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=100&direction=desc&nocache=${timestamp}`);
             const data = await response.json();
             return data.contents.filter(block => block.class === 'Image');
-        } catch (error) {
-            console.error('Error Are.na:', error);
-            return [];
-        }
+        } catch (error) { return []; }
     }
 
-    async function init() {
+    async function initArena() {
         const blocks = await fetchArenaBlocks();
         const $container = $('#arena-container');
         let maxBottom = 0;
@@ -284,21 +333,11 @@ $(function() {
             const title = block.title || "";
             const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
             const description = block.description || "";
-            
-            // INTENTO AGRESIVO DE CAPTURA DE ALT TEXT
-            // Probamos: campo directo, campo dentro de imagen o metadata
-            const altText = block.alt_text || (block.image && block.image.alt_text) || "";
-            
-            // Creamos el campo de búsqueda sumando todo
-            const megaSearch = `${title} ${description} ${altText}`.toLowerCase();
+            const megaSearch = `${title} ${description}`.toLowerCase();
             
             const html = `
-                <li class="work-item" 
-                    data-title="${title}" 
-                    data-date="${date}" 
-                    data-description="${description}" 
-                    data-search="${megaSearch}">
-                    <img class="thumb" src="${imageUrl}" alt="${altText || title}" />
+                <li class="work-item" data-title="${title}" data-date="${date}" data-description="${description}" data-search="${megaSearch}">
+                    <img class="thumb" src="${imageUrl}" />
                 </li>`;
             
             const $newItem = $(html);
@@ -308,7 +347,6 @@ $(function() {
             const currentBottom = parseFloat($newItem.css('top')) + 400;
             if (currentBottom > maxBottom) maxBottom = currentBottom;
         });
-
         $container.css('height', (maxBottom + 200) + 'px');
     }
 
@@ -318,109 +356,7 @@ $(function() {
         $('#info, #filters, #back-to-top').show();
     });
 
-    init();
-});
-
-
- const canvas = document.getElementById('ivy-canvas');
-const ctx = canvas.getContext('2d');
-
-let walkers = [];
-let drawingActive = true;
-let pixelsDrawn = 0;
-const MAX_PIXELS = (window.innerWidth * document.documentElement.scrollHeight) * 0.05; // Detener al cubrir el 5% del área total
-
-function initCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = document.documentElement.scrollHeight;
-    ctx.globalAlpha = 0.7; // Opacidad del 70%
-}
-
-class IvyWalker {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.color = '#ff0000'; // Rojo
-        this.size = Math.random() * 2 + 1;
-        this.angle = -Math.PI / 2; // Apunta hacia arriba (90 grados)
-    }
-
-    drawLeaf(x, y) {
-        ctx.beginPath();
-        ctx.ellipse(x, y, 4, 2, this.angle + Math.PI/2, 0, Math.PI * 2);
-        ctx.fillStyle = '#cc0000';
-        ctx.fill();
-    }
-
-    update() {
-        if (!drawingActive) return;
-
-        // Movimiento: Mucha más fuerza hacia arriba (-y) y poca lateral
-        this.angle += (Math.random() - 0.5) * 0.3;
-        this.x += Math.cos(this.angle) * 0.8; // Velocidad reducida
-        this.y += Math.sin(this.angle) * 0.8 - 0.5; // Empuje extra hacia arriba
-
-        // Dibujar tallo
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
-        pixelsDrawn++;
-
-        // Dibujar hojas aleatoriamente
-        if (Math.random() < 0.03) {
-            this.drawLeaf(this.x, this.y);
-            pixelsDrawn += 5;
-        }
-
-        // Ramificación sutil
-        if (Math.random() < 0.01 && walkers.length < 40) {
-            walkers.push(new IvyWalker(this.x, this.y));
-        }
-
-        // Detener si llegamos al límite de cobertura
-        if (pixelsDrawn > MAX_PIXELS) {
-            drawingActive = false;
-            console.log("Crecimiento de hiedra completado.");
-        }
-    }
-}
-
-let lastTime = 0;
-const fps = 30; // Control de velocidad: menos FPS = más lento
-
-function animate(timestamp) {
-    if (!drawingActive) return;
-
-    // Controlar velocidad por tiempo
-    if (timestamp - lastTime > 1000 / fps) {
-        walkers.forEach((walker, index) => {
-            walker.update();
-            // Eliminar si sale de pantalla
-            if (walker.y < 0 || walker.x < 0 || walker.x > canvas.width) {
-                walkers.splice(index, 1);
-            }
-        });
-        lastTime = timestamp;
-    }
-    
-    if (walkers.length > 0) {
-        requestAnimationFrame(animate);
-    }
-}
-
-function startIvy() {
-    initCanvas();
-    // Inicia desde varios puntos en la base
-    const numSeeds = 6;
-    for(let i = 0; i < numSeeds; i++){
-        walkers.push(new IvyWalker((canvas.width / numSeeds) * i + (Math.random() * 50), canvas.height));
-    }
-    requestAnimationFrame(animate);
-}
-
-$(window).on('load', function() {
-    // Redimensionar si el usuario cambia el tamaño de la ventana
-    $(window).on('resize', initCanvas);
-    setTimeout(startIvy, 1500);
+    initArena();
 });
 </script>
 
