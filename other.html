@@ -143,13 +143,13 @@
         .ui-draggable-dragging { cursor: grabbing !important; }
 
         #ivy-canvas {
-    position: absolute; /* Para que crezca con el scroll del contenedor */
-    top: 0;
-    left: 0;
-    z-index: -1; /* Detrás de los videos y el menú */
-    pointer-events: none; /* Para que no bloquee los clics en los videos */
-    image-rendering: pixelated; /* Estética Sandspiel/Pixel Art */
-}
+             position: absolute; /* Para que crezca con el scroll del contenedor */
+             top: 0;
+             left: 0;
+             z-index: -1; /* Detrás de los videos y el menú */
+             pointer-events: none; /* Para que no bloquee los clics en los videos */
+             image-rendering: pixelated; /* Estética Sandspiel/Pixel Art */
+        }
 
         @media (max-width: 768px) {
             #info { font-size: 24pt; top: 60px; max-width: 85%; }
@@ -322,69 +322,105 @@ $(function() {
 });
 
 
-const canvas = document.getElementById('ivy-canvas');
+ const canvas = document.getElementById('ivy-canvas');
 const ctx = canvas.getContext('2d');
 
 let walkers = [];
+let drawingActive = true;
+let pixelsDrawn = 0;
+const MAX_PIXELS = (window.innerWidth * document.documentElement.scrollHeight) * 0.05; // Detener al cubrir el 5% del área total
 
 function initCanvas() {
-    // Ajustamos el canvas al tamaño total del documento, no solo de la ventana
     canvas.width = window.innerWidth;
     canvas.height = document.documentElement.scrollHeight;
+    ctx.globalAlpha = 0.7; // Opacidad del 70%
 }
 
 class IvyWalker {
-    constructor(x, y, color) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.color = color;
-        this.size = 2; // Tamaño del "píxel"
-        this.life = 0;
-        this.angle = Math.random() * Math.PI * 2;
+        this.color = '#ff0000'; // Rojo
+        this.size = Math.random() * 2 + 1;
+        this.angle = -Math.PI / 2; // Apunta hacia arriba (90 grados)
+    }
+
+    drawLeaf(x, y) {
+        ctx.beginPath();
+        ctx.ellipse(x, y, 4, 2, this.angle + Math.PI/2, 0, Math.PI * 2);
+        ctx.fillStyle = '#cc0000';
+        ctx.fill();
     }
 
     update() {
-        // Movimiento orgánico: ruidoso pero con tendencia hacia alguna dirección
-        this.angle += (Math.random() - 0.5) * 0.5;
-        this.x += Math.cos(this.angle) * 2;
-        this.y += Math.sin(this.angle) * 2 - 0.2; // Tendencia ligera a subir
+        if (!drawingActive) return;
 
-        this.life++;
+        // Movimiento: Mucha más fuerza hacia arriba (-y) y poca lateral
+        this.angle += (Math.random() - 0.5) * 0.3;
+        this.x += Math.cos(this.angle) * 0.8; // Velocidad reducida
+        this.y += Math.sin(this.angle) * 0.8 - 0.5; // Empuje extra hacia arriba
 
-        // Dibujar el rastro
+        // Dibujar tallo
         ctx.fillStyle = this.color;
-        ctx.fillRect(Math.floor(this.x), Math.floor(this.y), this.size, this.size);
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+        pixelsDrawn++;
 
-        // Ramificación aleatoria (como en Sandspiel)
-        if (Math.random() < 0.02 && walkers.length < 100) {
-            walkers.push(new IvyWalker(this.x, this.y, this.color));
+        // Dibujar hojas aleatoriamente
+        if (Math.random() < 0.03) {
+            this.drawLeaf(this.x, this.y);
+            pixelsDrawn += 5;
         }
+
+        // Ramificación sutil
+        if (Math.random() < 0.01 && walkers.length < 40) {
+            walkers.push(new IvyWalker(this.x, this.y));
+        }
+
+        // Detener si llegamos al límite de cobertura
+        if (pixelsDrawn > MAX_PIXELS) {
+            drawingActive = false;
+            console.log("Crecimiento de hiedra completado.");
+        }
+    }
+}
+
+let lastTime = 0;
+const fps = 30; // Control de velocidad: menos FPS = más lento
+
+function animate(timestamp) {
+    if (!drawingActive) return;
+
+    // Controlar velocidad por tiempo
+    if (timestamp - lastTime > 1000 / fps) {
+        walkers.forEach((walker, index) => {
+            walker.update();
+            // Eliminar si sale de pantalla
+            if (walker.y < 0 || walker.x < 0 || walker.x > canvas.width) {
+                walkers.splice(index, 1);
+            }
+        });
+        lastTime = timestamp;
+    }
+    
+    if (walkers.length > 0) {
+        requestAnimationFrame(animate);
     }
 }
 
 function startIvy() {
     initCanvas();
-    // Creamos puntos de inicio en la base de la página
-    for(let i = 0; i < 5; i++){
-        walkers.push(new IvyWalker(Math.random() * canvas.width, canvas.height - 10, '#2d5a27'));
+    // Inicia desde varios puntos en la base
+    const numSeeds = 6;
+    for(let i = 0; i < numSeeds; i++){
+        walkers.push(new IvyWalker((canvas.width / numSeeds) * i + (Math.random() * 50), canvas.height));
     }
-    animate();
-}
-
-function animate() {
-    walkers.forEach((walker, index) => {
-        walker.update();
-        // Eliminar si sale de los límites o vive demasiado
-        if (walker.x < 0 || walker.x > canvas.width || walker.y < 0 || walker.life > 500) {
-            walkers.splice(index, 1);
-        }
-    });
     requestAnimationFrame(animate);
 }
 
-// Iniciar cuando la página esté lista
 $(window).on('load', function() {
-    setTimeout(startIvy, 2000); // Aparece como easter egg tras 2 segundos
+    // Redimensionar si el usuario cambia el tamaño de la ventana
+    $(window).on('resize', initCanvas);
+    setTimeout(startIvy, 1500);
 });
 </script>
 
