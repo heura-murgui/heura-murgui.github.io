@@ -308,7 +308,13 @@ $(function() {
             'opacity': 1
         });
 
-        $el.draggable({ stack: ".work-item" });
+        $el.draggable({ 
+            stack: ".work-item", 
+            revert: false, 
+            revertDuration: 0,
+            distance: 0,
+            delay: 0
+        });
 
         $el.hover(
             function() {

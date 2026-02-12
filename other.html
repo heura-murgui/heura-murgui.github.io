@@ -276,11 +276,11 @@ animateBackground();
 window.addEventListener('resize', initBackground);
 
 
-/* ==========================================
+/*
    LÓGICA DE ARE.NA
    ========================================== */
 $(function() {
-    const CHANNEL_SLUG = 'angela-test';
+    const CHANNEL_SLUG = 'prvw-cmmrcl';
     const API_BASE = 'https://api.are.na/v2';
 
     // (Aquí va todo tu código JQuery original sin cambios...)
@@ -378,7 +378,13 @@ $(function() {
             'opacity': 1
         });
 
-        $el.draggable({ stack: ".work-item", revert: false, revertDuration: 0 });
+        $el.draggable({ 
+            stack: ".work-item", 
+            revert: false, 
+            revertDuration: 0,
+            distance: 0,
+            delay: 0
+        });
 
         $el.hover(
             function() {
