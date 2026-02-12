@@ -91,6 +91,24 @@
 
         #back-to-top:hover { color: white; }
 
+        #more {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            font-size: 11pt;
+            color: black;
+            cursor: pointer;
+            text-transform: uppercase;
+            background: red;
+            padding: 5px 10px;
+            font-family: inherit;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        #more:hover { color: white; background-color: red; }
+
         header {
             position: fixed;
             bottom: 20px;
@@ -169,6 +187,7 @@
 </ul>
 
 <button id="back-to-top">↑ back to top</button>
+<a id="more" href="other.html">→ more</a>
 <div id="fullscreen-viewer"></div>
 
 <header>
