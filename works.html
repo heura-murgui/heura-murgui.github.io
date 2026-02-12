@@ -213,6 +213,59 @@ $(function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    // Función para mezclar array
+    function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    // Función para reubicar items
+    function repositionVisibleItems() {
+        const $container = $('#arena-container');
+        const windowWidth = $(window).width();
+        const isMobile = windowWidth < 768;
+        const itemWidth = isMobile ? 180 : 320;
+        const spacing = isMobile ? 130 : 150;
+        const variation = isMobile ? 50 : 80;
+        
+        // Obtener todos los items visibles
+        const visibleItems = $('.work-item').filter(function() {
+            return $(this).css('display') !== 'none';
+        }).toArray();
+        
+        // Mezclar los items visibles
+        const shuffled = shuffleArray(visibleItems);
+        
+        let maxBottom = 0;
+        
+        // Reubicar cada item
+        shuffled.forEach((element, index) => {
+            const $el = $(element);
+            const sign = Math.random() < 0.5 ? '-' : '+';
+            const posx = Math.random() * (windowWidth - itemWidth - 20);
+            const posy = (index * spacing) + (Math.random() * variation);
+            const rota = (Math.random() * 0).toFixed(2);
+            
+            $el.css({
+                'left': Math.max(10, posx) + 'px',
+                'top': posy + 'px',
+                'transform': `rotate(${sign}${rota}deg)`,
+                'opacity': 1,
+                'transition': 'all 0.4s ease-in-out'
+            });
+            
+            const currentBottom = posy + 400;
+            if (currentBottom > maxBottom) maxBottom = currentBottom;
+        });
+        
+        // Actualizar altura del contenedor
+        $container.css('height', (maxBottom + 200) + 'px');
+    }
+
     // Lógica de filtrado
     $('#filters li').on('click', function() {
         const filter = $(this).attr('data-filter').toLowerCase();
@@ -231,6 +284,9 @@ $(function() {
                 }
             });
         }
+        
+        // Llamar repositioning después de que el fade complete
+        setTimeout(repositionVisibleItems, 450);
     });
 
     function applyChaosLogic(element, index) {
