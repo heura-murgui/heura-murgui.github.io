@@ -400,10 +400,8 @@ $(function() {
 
         $el.on('click', function(e) {
             if ($(this).hasClass('ui-draggable-dragging')) return;
-            const imgSrc = $(this).find('img').attr('src');
-            $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).show();
-            $('body').addClass('lock-scroll');
-            $('#info, #filters, #back-to-top').hide();
+            const videoUrl = $(this).attr('data-video-url');
+            window.open(videoUrl, '_blank');
         });
     }
 
@@ -412,7 +410,7 @@ $(function() {
             const timestamp = new Date().getTime();
             const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=100&direction=desc&nocache=${timestamp}`);
             const data = await response.json();
-            return data.contents.filter(block => block.class === 'Image');
+            return data.contents.filter(block => block.class === 'Video');
         } catch (error) { return []; }
     }
 
@@ -422,15 +420,16 @@ $(function() {
         let maxBottom = 0;
 
         blocks.forEach((block, i) => {
-            const imageUrl = block.image.display.url;
+            const thumbnailUrl = block.image ? block.image.display.url : block.source.url;
+            const videoUrl = block.source ? block.source.url : block.embed_url;
             const title = block.title || "";
             const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
             const description = block.description || "";
             const megaSearch = `${title} ${description}`.toLowerCase();
             
             const html = `
-                <li class="work-item" data-title="${title}" data-date="${date}" data-description="${description}" data-search="${megaSearch}">
-                    <img class="thumb" src="${imageUrl}" />
+                <li class="work-item" data-title="${title}" data-date="${date}" data-description="${description}" data-search="${megaSearch}" data-video-url="${videoUrl}">
+                    <img class="thumb" src="${thumbnailUrl}" />
                 </li>`;
             
             const $newItem = $(html);
