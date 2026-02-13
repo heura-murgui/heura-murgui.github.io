@@ -180,10 +180,10 @@
 
 <ul id="filters">
     <li class="active" data-filter="all">#all</li>
-    <li data-filter="#35mm">#35mm</li>
     <li data-filter="#editorial">#editorial</li>
-    <li data-filter="#fashion">#fashion</li>
-    <li data-filter="#product">#product</li>
+    <li data-filter="#campaigns">#campaigns</li>
+    <li data-filter="#film">#film</li>
+    <li data-filter="#still-life">#still-life</li>
 </ul>
 
 <button id="back-to-top">↑ back to top</button>
@@ -367,9 +367,25 @@ $(function() {
             // INTENTO AGRESIVO DE CAPTURA DE ALT TEXT
             // Probamos: campo directo, campo dentro de imagen o metadata
             const altText = block.alt_text || (block.image && block.image.alt_text) || "";
-            
-            // Creamos el campo de búsqueda sumando todo
-            const megaSearch = `${title} ${description} ${altText}`.toLowerCase();
+
+            // Intentamos extraer tags (si existen) y añadir versiones "normal" y con #
+            let tagsArray = [];
+            if (block.tags && Array.isArray(block.tags)) {
+                tagsArray = block.tags.map(t => {
+                    if (!t) return '';
+                    if (typeof t === 'string') return t;
+                    if (t.title) return t.title;
+                    if (t.slug) return t.slug;
+                    return '';
+                }).filter(Boolean);
+            }
+
+            const hashtagString = tagsArray.map(t => {
+                return ('#' + String(t).toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-#]/g, ''));
+            }).join(' ');
+
+            // Creamos el campo de búsqueda sumando todo, incluyendo tags y hashtags
+            const megaSearch = `${title} ${description} ${altText} ${tagsArray.join(' ')} ${hashtagString}`.toLowerCase();
             
             const html = `
                 <li class="work-item" 

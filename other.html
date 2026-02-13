@@ -176,10 +176,10 @@
 
 <ul id="filters">
     <li class="active" data-filter="all">#all</li>
-    <li data-filter="#35mm">#35mm</li>
     <li data-filter="#editorial">#editorial</li>
-    <li data-filter="#fashion">#fashion</li>
-    <li data-filter="#product">#product</li>
+    <li data-filter="#campaigns">#campaigns</li>
+    <li data-filter="#film">#film</li>
+    <li data-filter="#still-life">#still-life</li>
 </ul>
 
 <div id="fullscreen-viewer"></div>
@@ -425,7 +425,24 @@ $(function() {
             const title = block.title || "";
             const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
             const description = block.description || "";
-            const megaSearch = `${title} ${description}`.toLowerCase();
+
+            // Intentamos extraer tags (si existen) y añadir versiones "normal" y con #
+            let tagsArray = [];
+            if (block.tags && Array.isArray(block.tags)) {
+                tagsArray = block.tags.map(t => {
+                    if (!t) return '';
+                    if (typeof t === 'string') return t;
+                    if (t.title) return t.title;
+                    if (t.slug) return t.slug;
+                    return '';
+                }).filter(Boolean);
+            }
+
+            const hashtagString = tagsArray.map(t => {
+                return ('#' + String(t).toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-#]/g, ''));
+            }).join(' ');
+
+            const megaSearch = `${title} ${description} ${tagsArray.join(' ')} ${hashtagString}`.toLowerCase();
             
             const html = `
                 <li class="work-item" data-title="${title}" data-date="${date}" data-description="${description}" data-search="${megaSearch}" data-video-url="${videoUrl}">
