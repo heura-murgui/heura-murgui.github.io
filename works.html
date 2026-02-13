@@ -313,7 +313,24 @@ $(function() {
             revert: false, 
             revertDuration: 0,
             distance: 0,
-            delay: 0
+            delay: 0,
+            start: function() {
+                const $t = $(this);
+                // store any existing transition so we can restore it after drag
+                $t.data('prev-transition', $t.css('transition') || '');
+                // disable CSS transitions during drag for 1:1 movement
+                $t.css('transition', 'none');
+            },
+            stop: function() {
+                const $t = $(this);
+                const prev = $t.data('prev-transition');
+                // restore previous transition (or leave empty)
+                if (typeof prev !== 'undefined' && prev !== null) {
+                    $t.css('transition', prev);
+                } else {
+                    $t.css('transition', '');
+                }
+            }
         });
 
         $el.hover(
