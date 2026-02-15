@@ -143,6 +143,8 @@
             pointer-events: none;
         }
 
+
+        #home { text-decoration: none; color: black; }
         #fullscreen-viewer {
             display: none;
             position: fixed;
@@ -150,14 +152,27 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: white;
-            z-index: 10000;
-            overflow-y: scroll;
+            background: rgba(0,0,0,0.95);
+            z-index: 100000;
+            overflow: hidden;
             cursor: zoom-out;
+            align-items: center;
+            justify-content: center;
+            display: none;
         }
 
-        #home { text-decoration: none; color: black; }
-        #fullscreen-viewer img { width: 100%; height: auto; display: block; }
+        #fullscreen-viewer.show { display: flex; }
+
+        #fullscreen-viewer img {
+            max-width: 95vw;
+            max-height: 95vh;
+            width: auto;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            transition: transform 220ms ease, opacity 220ms ease;
+            cursor: zoom-out;
+        }
         .ui-draggable-dragging { cursor: grabbing !important; }
 
         @media (max-width: 768px) {
@@ -205,7 +220,7 @@
 
 <script>
 $(function() {
-    const CHANNEL_SLUG = 'heura-test';
+    const CHANNEL_SLUG = 'heura-murgui';
     const API_BASE = 'https://api.are.na/v2';
 
     // Botón volver arriba
@@ -352,7 +367,7 @@ $(function() {
         $el.on('click', function(e) {
             if ($(this).hasClass('ui-draggable-dragging')) return;
             const imgSrc = $(this).find('img').attr('src');
-            $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).show();
+            $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).addClass('show');
             $('body').addClass('lock-scroll');
             $('#info, #filters, #back-to-top').hide();
         });
@@ -424,8 +439,11 @@ $(function() {
         $container.css('height', (maxBottom + 200) + 'px');
     }
 
+    // Close viewer when clicking anywhere (including the image)
     $('#fullscreen-viewer').on('click', function() {
-        $(this).hide().empty();
+        const $v = $(this);
+        $v.removeClass('show');
+        setTimeout(() => { $v.empty(); }, 240);
         $('body').removeClass('lock-scroll');
         $('#info, #filters, #back-to-top').show();
     });
