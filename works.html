@@ -27,7 +27,6 @@
             height: 100vh !important;
         }
 
-        /* SISTEMA DE FILTROS */
         #filters {
             position: fixed;
             left: 20px;
@@ -89,8 +88,6 @@
             font-family: inherit;
         }
 
-        #back-to-top:hover { color: white; }
-
         #more {
             position: fixed;
             bottom: 20px;
@@ -107,8 +104,6 @@
             text-decoration: none;
         }
 
-        #more:hover { color: white; background-color: red; }
-
         header {
             position: fixed;
             bottom: 20px;
@@ -118,7 +113,6 @@
 
         nav li { list-style: none; margin: 0; padding: 0; }
         a { text-decoration: none; color: rgb(255, 0, 0); }
-        a:hover { color: #ffffff; background-color: rgb(110, 108, 108); }
 
         .container-chaos {
             list-style: none;
@@ -143,8 +137,7 @@
             pointer-events: none;
         }
 
-
-        #home { text-decoration: none; color: black; }
+        /* VISOR CORREGIDO SIN DISPLAY DUPLICADO */
         #fullscreen-viewer {
             display: none;
             position: fixed;
@@ -158,32 +151,27 @@
             cursor: zoom-out;
             align-items: center;
             justify-content: center;
-            display: none;
         }
 
-        #fullscreen-viewer.show { display: flex; }
+        #fullscreen-viewer.show { 
+            display: flex !important; 
+        }
 
         #fullscreen-viewer img {
             max-width: 95vw;
             max-height: 95vh;
             width: auto;
             height: auto;
-            display: block;
             object-fit: contain;
-            transition: transform 220ms ease, opacity 220ms ease;
-            cursor: zoom-out;
         }
-        .ui-draggable-dragging { cursor: grabbing !important; }
 
         @media (max-width: 768px) {
             #info { font-size: 24pt; top: 60px; max-width: 85%; }
-            .info-desc { font-size: 11pt; }
             #filters {
                 top: auto; bottom: 80px; left: 20px;
                 transform: none; display: flex; flex-wrap: wrap;
                 width: calc(100% - 40px);
             }
-            #filters li { padding: 0px 4px; }
             .work-item { width: 180px; }
             header { width: 100%; left: 0; bottom: 0; padding: 5px 25px; box-sizing: border-box; }
         }
@@ -223,12 +211,10 @@ $(function() {
     const CHANNEL_SLUG = 'heura-murgui';
     const API_BASE = 'https://api.are.na/v2';
 
-    // Botón volver arriba
     $('#back-to-top').on('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Función para mezclar array
     function shuffleArray(array) {
         const shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -238,7 +224,6 @@ $(function() {
         return shuffled;
     }
 
-    // Función para reubicar items
     function repositionVisibleItems() {
         const $container = $('#arena-container');
         const windowWidth = $(window).width();
@@ -247,106 +232,68 @@ $(function() {
         const spacing = isMobile ? 130 : 150;
         const variation = isMobile ? 50 : 80;
         
-        // Obtener todos los items visibles
         const visibleItems = $('.work-item').filter(function() {
             return $(this).css('display') !== 'none';
         }).toArray();
         
-        // Mezclar los items visibles
         const shuffled = shuffleArray(visibleItems);
-        
         let maxBottom = 0;
         
-        // Reubicar cada item
         shuffled.forEach((element, index) => {
             const $el = $(element);
-            const sign = Math.random() < 0.5 ? '-' : '+';
             const posx = Math.random() * (windowWidth - itemWidth - 20);
             const posy = (index * spacing) + (Math.random() * variation);
-            const rota = (Math.random() * 0).toFixed(2);
             
             $el.css({
                 'left': Math.max(10, posx) + 'px',
                 'top': posy + 'px',
-                'transform': `rotate(${sign}${rota}deg)`,
-                'opacity': 1,
-                'transition': 'all 0.4s ease-in-out'
+                'opacity': 1
             });
             
             const currentBottom = posy + 400;
             if (currentBottom > maxBottom) maxBottom = currentBottom;
         });
         
-        // Actualizar altura del contenedor
         $container.css('height', (maxBottom + 200) + 'px');
     }
 
-    // Lógica de filtrado
     $('#filters li').on('click', function() {
         const filter = $(this).attr('data-filter').toLowerCase();
         $('#filters li').removeClass('active');
         $(this).addClass('active');
 
         if (filter === 'all') {
-            $('.work-item').fadeIn(400);
+            $('.work-item').show();
         } else {
             $('.work-item').each(function() {
                 const searchContent = ($(this).attr('data-search') || "").toLowerCase();
                 if (searchContent.includes(filter)) {
-                    $(this).fadeIn(400);
+                    $(this).show();
                 } else {
-                    $(this).fadeOut(400);
+                    $(this).hide();
                 }
             });
         }
-        
-        // Llamar repositioning después de que el fade complete
-        setTimeout(repositionVisibleItems, 450);
+        repositionVisibleItems();
     });
 
     function applyChaosLogic(element, index) {
         const $el = $(element);
         const windowWidth = $(window).width();
         const isMobile = windowWidth < 768;
-        const sign = Math.random() < 0.5 ? '-' : '+';
         const itemWidth = isMobile ? 180 : 320;
         const posx = Math.random() * (windowWidth - itemWidth - 20);
         const spacing = isMobile ? 130 : 150;
         const variation = isMobile ? 50 : 80;
         const posy = (index * spacing) + (Math.random() * variation);
-        const rota = (Math.random() * 0).toFixed(2);
 
         $el.css({
             'left': Math.max(10, posx) + 'px',
             'top': posy + 'px',
-            'transform': `rotate(${sign}${rota}deg)`,
             'opacity': 1
         });
 
-        $el.draggable({ 
-            stack: ".work-item", 
-            revert: false, 
-            revertDuration: 0,
-            distance: 0,
-            delay: 0,
-            start: function() {
-                const $t = $(this);
-                // store any existing transition so we can restore it after drag
-                $t.data('prev-transition', $t.css('transition') || '');
-                // disable CSS transitions during drag for 1:1 movement
-                $t.css('transition', 'none');
-            },
-            stop: function() {
-                const $t = $(this);
-                const prev = $t.data('prev-transition');
-                // restore previous transition (or leave empty)
-                if (typeof prev !== 'undefined' && prev !== null) {
-                    $t.css('transition', prev);
-                } else {
-                    $t.css('transition', '');
-                }
-            }
-        });
+        $el.draggable({ stack: ".work-item" });
 
         $el.hover(
             function() {
@@ -356,18 +303,17 @@ $(function() {
                 let infoHtml = `<div>${title} <span style="font-weight:400; font-size:0.4em;">(${date})</span></div>`;
                 if (desc && desc !== "null" && desc !== "") infoHtml += `<div class="info-desc">${desc}</div>`;
                 $('#info').html(infoHtml);
-                $(this).css('z-index', '9000');
             },
-            function() {
-                $('#info').html('');
-                $(this).css('z-index', '10');
-            }
+            function() { $('#info').html(''); }
         );
 
         $el.on('click', function(e) {
             if ($(this).hasClass('ui-draggable-dragging')) return;
             const imgSrc = $(this).find('img').attr('src');
-            $('#fullscreen-viewer').html(`<img src="${imgSrc}">`).addClass('show');
+            $('#fullscreen-viewer')
+                .html(`<img src="${imgSrc}">`)
+                .show()
+                .addClass('show');
             $('body').addClass('lock-scroll');
             $('#info, #filters, #back-to-top').hide();
         });
@@ -375,12 +321,10 @@ $(function() {
 
     async function fetchArenaBlocks() {
         try {
-            const timestamp = new Date().getTime();
-            const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=100&direction=desc&nocache=${timestamp}`);
+            const response = await fetch(`${API_BASE}/channels/${CHANNEL_SLUG}/contents?per=100&direction=desc&nocache=${new Date().getTime()}`);
             const data = await response.json();
             return data.contents.filter(block => block.class === 'Image');
         } catch (error) {
-            console.error('Error Are.na:', error);
             return [];
         }
     }
@@ -395,55 +339,30 @@ $(function() {
             const title = block.title || "";
             const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
             const description = block.description || "";
-            
-            // INTENTO AGRESIVO DE CAPTURA DE ALT TEXT
-            // Probamos: campo directo, campo dentro de imagen o metadata
             const altText = block.alt_text || (block.image && block.image.alt_text) || "";
 
-            // Intentamos extraer tags (si existen) y añadir versiones "normal" y con #
             let tagsArray = [];
             if (block.tags && Array.isArray(block.tags)) {
-                tagsArray = block.tags.map(t => {
-                    if (!t) return '';
-                    if (typeof t === 'string') return t;
-                    if (t.title) return t.title;
-                    if (t.slug) return t.slug;
-                    return '';
-                }).filter(Boolean);
+                tagsArray = block.tags.map(t => typeof t === 'string' ? t : (t.title || '')).filter(Boolean);
             }
-
-            const hashtagString = tagsArray.map(t => {
-                return ('#' + String(t).toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-#]/g, ''));
-            }).join(' ');
-
-            // Creamos el campo de búsqueda sumando todo, incluyendo tags y hashtags
+            const hashtagString = tagsArray.map(t => '#' + String(t).toLowerCase().trim().replace(/\s+/g, '-')).join(' ');
             const megaSearch = `${title} ${description} ${altText} ${tagsArray.join(' ')} ${hashtagString}`.toLowerCase();
             
-            const html = `
-                <li class="work-item" 
-                    data-title="${title}" 
-                    data-date="${date}" 
-                    data-description="${description}" 
-                    data-search="${megaSearch}">
-                    <img class="thumb" src="${imageUrl}" alt="${altText || title}" />
-                </li>`;
+            const html = `<li class="work-item" data-title="${title}" data-date="${date}" data-description="${description}" data-search="${megaSearch}">
+                            <img class="thumb" src="${imageUrl}" alt="${altText || title}" />
+                          </li>`;
             
             const $newItem = $(html);
             $container.append($newItem);
             applyChaosLogic($newItem, i);
-
-            const currentBottom = parseFloat($newItem.css('top')) + 400;
+            const currentBottom = (i * 150) + 400;
             if (currentBottom > maxBottom) maxBottom = currentBottom;
         });
-
-        $container.css('height', (maxBottom + 200) + 'px');
+        $container.css('height', (maxBottom + 300) + 'px');
     }
 
-    // Close viewer when clicking anywhere (including the image)
     $('#fullscreen-viewer').on('click', function() {
-        const $v = $(this);
-        $v.removeClass('show');
-        setTimeout(() => { $v.empty(); }, 240);
+        $(this).removeClass('show').hide().empty();
         $('body').removeClass('lock-scroll');
         $('#info, #filters, #back-to-top').show();
     });
@@ -451,6 +370,5 @@ $(function() {
     init();
 });
 </script>
-
 </body>
 </html>
