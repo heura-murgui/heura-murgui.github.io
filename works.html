@@ -147,22 +147,18 @@
             height: 100vh;
             background: rgba(0,0,0,0.95);
             z-index: 100000;
-            overflow: hidden;
+            overflow: auto;
             cursor: zoom-out;
-            align-items: center;
-            justify-content: center;
         }
 
         #fullscreen-viewer.show { 
-            display: flex !important; 
+            display: block !important; 
         }
 
         #fullscreen-viewer img {
-            max-width: 95vw;
-            max-height: 95vh;
-            width: auto;
+            width: 100%;
             height: auto;
-            object-fit: contain;
+            display: block;
         }
 
         @media (max-width: 768px) {
