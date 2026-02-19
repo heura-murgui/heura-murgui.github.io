@@ -37,6 +37,7 @@
              z-index: -1; /* Detrás de todo */
              pointer-events: none; /* No interfiere con clics */
              image-rendering: pixelated;
+             opacity: 0.5 ;
         }
 
         /* SISTEMA DE FILTROS Y OTROS ESTILOS */
@@ -95,7 +96,7 @@
             color: black;
             cursor: pointer;
             text-transform: uppercase;
-            background: red;
+            background: #ff0000;
             border: none;
             padding: 5px 10px;
             font-family: inherit;
@@ -166,14 +167,61 @@
             .work-item { width: 180px; }
             header { width: 100%; left: 0; bottom: 0; padding: 5px 25px; box-sizing: border-box; }
         }
+
+        /* --- OVERLAY wip --- */
+#maintenance-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10001; /* Por encima de todo */    
+    padding: 20px 40px;   
+    text-align: center;
+    
+}
+
+#maintenance-overlay p {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 11pt;
+    text-transform: lowercase;
+}
+
+.progress-container {
+    width: 150px;
+    height: 8px;
+    border: 1px solid black;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 30%; /* Progreso actual */
+    height: 100%;
+    background-color: #ff0000;
+    
+}
+
+@keyframes loading {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(150%); }
+    100% { transform: translateX(-100%); }
+}
     </style>
 </head>
 <body>
 
 <canvas id="ivy-canvas"></canvas>
+
+<div id="maintenance-overlay">
+    <p>page under construction, <br>ready soon(ish)</p>
+    <div class="progress-container">
+        <div class="progress-bar"></div>
+    </div>
+</div>
     
 <div id="info"></div>
-
+<!-- SISTEMA DE FILTROS 
 <ul id="filters">
     <li class="active" data-filter="all">#all</li>
     <li data-filter="#editorial">#editorial</li>
@@ -181,7 +229,7 @@
     <li data-filter="#film">#film</li>
     <li data-filter="#still-life">#still-life</li>
 </ul>
-
+-->
 <div id="fullscreen-viewer"></div>
 
 <header>
@@ -203,7 +251,7 @@
    ========================================== */
 const canvas = document.getElementById('ivy-canvas');
 const ctx = canvas.getContext('2d');
-const pixelSize = 4;
+const pixelSize = 2;
 const colors = {
     stem: '#4a6d55',
     flowers: ['#9cd888', '#9cd888', '#9cd888', '#9cd888'],
