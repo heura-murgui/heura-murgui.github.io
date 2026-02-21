@@ -144,6 +144,17 @@
             object-fit: cover;
         }
 
+        /* --- Estilos para el Watermark (Independiente) --- */
+        .watermark {
+            font-size: 10px;    
+            color: black;      
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            text-align: right;
+            text-transform: lowercase;
+         }
+
         /* --- AJUSTES RESPONSIVE --- */
         @media (max-width: 768px) {
             body {
@@ -227,6 +238,10 @@
             </div>
        </main>  
     </div>
+
+    <div class="watermark"> 
+                <i style="color:gray">Website designed by <a href="https://martamatroska.github.io/" style="color: gray" target="_blank">@marta.mkv</a></i>
+             </div>
 
 <script>
     const closeBtn = document.querySelector('.btn-close');
