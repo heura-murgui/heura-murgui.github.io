@@ -110,17 +110,17 @@
     <h1 class="visually-hidden">Heura Murgui - Visual Strategist & Photographer based in Spain</h1>
 
     <header id="list">
-    
         <nav>
-            <li style="color: black;">Heura Murgui</li>
-            <li><a href="works.html">works</a></li>
-            <li><a href="contact.html">about</a></li>
-            <li><a href="mailto:heuramurgui@gmail.com">heuramurgui (at) gmail (dot) com</a></li>
+            <ul>
+                <li style="color: black;">Heura Murgui</li>
+                <li><a href="works.html">works</a></li>
+                <li><a href="contact.html">about</a></li>
+                <li><a href="mailto:heuramurgui@gmail.com">heuramurgui (at) gmail (dot) com</a></li>
+            </ul>
         </nav>
     </header>
 
     <script>
-        // --- CLASE BSPLINE ---
         var BSpline = function(points, degree) {
             this.points = points;
             this.degree = degree;
@@ -181,15 +181,12 @@
             document.body.appendChild(listClone);
         };
 
-        // 1. Calculamos el centro exacto de la pantalla
         const centroY = h / 2;
         const centroX = w / 2;
 
-        // 2. Generamos puntos, pero el PRIMERO es siempre el centro
         let points = [];
-        points.push([centroY, centroX]); // Punto inicial: centro
+        points.push([centroY, centroX]); 
 
-        // Añadimos el resto de puntos aleatorios
         for(let i = 0; i < 4; i++) {
             points.push([
                 Math.random() * (h - 100) + 50, 
@@ -203,7 +200,7 @@
         let interval = setInterval(() => {
             var p = spline.calcAt(t);
             drawClone(p);
-            t += 0.004; // Un poco más lento para apreciar el inicio
+            t += 0.004; 
             if (t >= 1) clearInterval(interval);
         }, 25);
     </script>
