@@ -6,7 +6,7 @@
     <title>HEURA MURGUI</title>
     <link rel="icon" href="assets/faviribbon.ico">
     <style>
-        /* ESTILOS BASE */
+      
         html, body {
             height: 100%;
             margin: 0;
@@ -22,17 +22,16 @@
             color: #1a1a1a;
             background-color: #f4f4f4;
             display: flex;
-            justify-content: flex-end; 
+            justify-content: flex-start; 
             align-items: flex-end;  
             padding: 30px;
             box-sizing: border-box;
             position: relative;
-            min-height: 100vh;
             flex-direction: column;
+            min-height: 100vh; 
         }
 
 
-        /* CONTENEDOR DE TEXTO (DERECHA) */
         .main-container {
             display: flex;
             flex-direction: column;
@@ -102,7 +101,7 @@
             gap: 2px;
         }
 
-        /* AJUSTE ESPECÍFICO PARA BOTONES (SAFARI MÓVIL) */
+        
         .win98-btn {
             width: 52px;
             height: 50px;
@@ -110,12 +109,10 @@
             border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
             
-            /* Forzar estilos visuales */
             font-family: "Times New Roman", Times, serif !important;
             color: #000000 !important;
             font-size: 48pt;
             
-            /* Reset nativo de Safari/iOS */
             -webkit-appearance: none;
             appearance: none;
             border-radius: 0;
@@ -156,13 +153,12 @@
             right: 15px;
             text-align: right;
             text-transform: lowercase;
-            pointer-events: auto; /* Permite que el link sea clickable */
-            padding-bottom: 15px; /* Espacio extra al final */
-            z-index: 20; /* Asegura que esté por encima de las ventanas clonadas */
+            pointer-events: auto; 
+            padding-bottom: 15px; 
+            z-index: 20; 
         }
     
 
-        /* --- AJUSTES RESPONSIVE --- */
         @media (max-width: 768px) {
             body {
                 justify-content: center;
@@ -173,7 +169,7 @@
             }
 
             .main-container {
-                align-items: flex-end; /* Mantenemos derecha según el estilo original */
+                align-items: flex-end; 
                 text-align: right;
                 max-width: 100%;
                 margin-top: 450px; 
@@ -262,7 +258,6 @@
         if (isCloning) return; 
         isCloning = true;
 
-        // Número total de ventanas que se crearán
         const totalClones = 80; 
 
         const interval = setInterval(() => {
@@ -273,18 +268,15 @@
 
             const clone = originalWindow.cloneNode(true);
             
-            // Posiciones aleatorias por toda la pantalla (de 0 a 85% para que no se salgan)
             const randomTop = Math.random() * 85; 
             const randomLeft = Math.random() * 85;
             
-            // Aplicamos estilos de posición fija para que se superpongan a todo
             clone.style.position = 'fixed';
             clone.style.top = randomTop + '%';
             clone.style.left = randomLeft + '%';
             clone.style.transform = 'translate(0, 0)'; 
             clone.style.zIndex = 100 + count;
             
-            // Deshabilitar el botón en los clones
             const cloneCloseBtn = clone.querySelector('.btn-close');
             cloneCloseBtn.style.cursor = 'default';
             cloneCloseBtn.onclick = (e) => {
@@ -294,7 +286,7 @@
 
             document.body.appendChild(clone);
             count++;
-        }, 40); // Velocidad de aparición (40ms es muy rápido)
+        }, 40); 
     });
 </script>
 
