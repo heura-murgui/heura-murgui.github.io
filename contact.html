@@ -149,18 +149,18 @@
         }
 
        .watermark {
-    font-size: 10px;    
-    color: gray;      
-    /* Cambiamos fixed por absolute para que se quede al final del contenido */
-    position: absolute; 
-    bottom: 15px;
-    right: 15px;
-    text-align: right;
-    text-transform: lowercase;
-    width: 100%; /* Asegura que el alineado a la derecha funcione */
-    pointer-events: auto; /* Permite que el link sea clickable */
-    padding-bottom: 15px; /* Espacio extra al final */
-}
+            font-size: 10px;    
+            color: gray;      
+            position: absolute; 
+            bottom: 15px;
+            right: 15px;
+            text-align: right;
+            text-transform: lowercase;
+            pointer-events: auto; /* Permite que el link sea clickable */
+            padding-bottom: 15px; /* Espacio extra al final */
+            z-index: 20; /* Asegura que esté por encima de las ventanas clonadas */
+        }
+    
 
         /* --- AJUSTES RESPONSIVE --- */
         @media (max-width: 768px) {
