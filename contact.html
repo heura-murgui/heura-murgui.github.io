@@ -23,10 +23,14 @@
             background-color: #f4f4f4;
             display: flex;
             justify-content: flex-end; 
-            align-items: flex-start;  
+            align-items: flex-end;  
             padding: 30px;
             box-sizing: border-box;
+            position: relative;
+            min-height: 100vh;
+            flex-direction: column;
         }
+
 
         /* CONTENEDOR DE TEXTO (DERECHA) */
         .main-container {
@@ -144,16 +148,19 @@
             object-fit: cover;
         }
 
-        /* --- Estilos para el Watermark (Independiente) --- */
-        .watermark {
-            font-size: 10px;    
-            color: black;      
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            text-align: right;
-            text-transform: lowercase;
-         }
+       .watermark {
+    font-size: 10px;    
+    color: gray;      
+    /* Cambiamos fixed por absolute para que se quede al final del contenido */
+    position: absolute; 
+    bottom: 15px;
+    right: 15px;
+    text-align: right;
+    text-transform: lowercase;
+    width: 100%; /* Asegura que el alineado a la derecha funcione */
+    pointer-events: auto; /* Permite que el link sea clickable */
+    padding-bottom: 15px; /* Espacio extra al final */
+}
 
         /* --- AJUSTES RESPONSIVE --- */
         @media (max-width: 768px) {
@@ -235,6 +242,7 @@
                 <a href="https://www.instagram.com/heuramurgui/" target="_blank">@heuramurgui</a>
                 <br>
                 <a href="https://www.linkedin.com/in/heura-murgui" target="_blank">LinkedIn</a>
+                <br><br><br><br><br><br>
             </div>
        </main>  
     </div>
