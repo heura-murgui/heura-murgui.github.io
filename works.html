@@ -163,7 +163,7 @@
         }
 
         #fullscreen-viewer img {
-            width: 100%;
+            width: auto;
             height: auto;
             display: block;
         }
@@ -339,7 +339,7 @@ $(function() {
         let maxBottom = 0;
 
         blocks.forEach((block, i) => {
-            const imageUrl = block.image.display.url;
+            const imageUrl = block.image.original.url;
             const title = block.title || "";
             const date = new Date(block.created_at).toLocaleDateString('es-ES', { year: 'numeric' });
             const description = block.description || "";
